@@ -1,0 +1,217 @@
+\documentclass[preprint,12pt]{elsarticle}
+
+% ============================================================
+% Supplementary Material for EVLA
+% Engineering Applications of Artificial Intelligence submission
+% ============================================================
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+
+% Custom commands
+\newcommand{\EVLA}{EVLA}
+\newcommand{\Dset}{\mathcal{D}_{\mathrm{EVLA}}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\clip}{\operatorname{clip}}
+\newcommand{\soc}{q}
+\newcommand{\Tin}{T_{\mathrm{in}}}
+\newcommand{\vis}{V}
+\newcommand{\state}{S}
+\newcommand{\lang}{L}
+\newcommand{\hidden}{Z}
+\newcommand{\action}{A}
+\newcommand{\meanpm}[2]{#1$\pm$#2}
+
+\journal{Engineering Applications of Artificial Intelligence}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Supplementary Material for\\
+Energy Vision--Language--Action: A Physics-Grounded Multimodal Benchmark for Intent-Conditioned Residential Energy Management}
+
+\author[aff1]{Lyes Saad Saoud}
+\author[aff1]{Oualid Doukhi}
+\author[aff2]{Coauthor Name}
+
+\affiliation[aff1]{
+    organization={Department or Center Name, University Name},
+    city={City},
+    country={Country}
+}
+
+\affiliation[aff2]{
+    organization={Department or Center Name, University Name},
+    city={City},
+    country={Country}
+}
+
+\end{frontmatter}
+
+\section{Purpose of the Supplementary Material}
+\label{supp:purpose}
+
+This supplementary material provides additional information that supports the EVLA manuscript without interrupting the main paper. The main manuscript presents the benchmark formulation, dataset construction, trajectory-prediction model, experimental protocol, and principal findings. This document provides complementary details on dataset validation, counterfactual organization, oracle construction, complete ablation tables, and the computational environment.
+
+All information reported here refers to the same EVLA benchmark described in the main manuscript. No separate dataset version is introduced in this supplementary material.
+
+\section{Detailed Dataset Validation}
+\label{supp:dataset_validation}
+
+The EVLA benchmark contains 439,203 retained base operating states and 6,588,045 multimodal samples. Each base operating state is expanded into 15 counterfactual worlds formed by three hidden visual regimes and five language objectives. Table~\ref{tab:supp_validation} provides the detailed validation summary.
+
+\begin{table}[t]
+\centering
+\caption{Detailed EVLA dataset validation summary.}
+\label{tab:supp_validation}
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+Total multimodal samples & 6,588,045 \\
+Unique base operating states & 439,203 \\
+Expansion factor & 15 \\
+Samples per \((Z,L)\) cell & 439,203 \\
+Malformed JSON files & 0 \\
+Missing state files & 0 \\
+Trajectories with length not equal to 16 & 0 \\
+Groups with inconsistent SOC or indoor temperature & 0 \\
+Unique SOC values & 7,496 \\
+Unique indoor-temperature values & 6,645 \\
+Sampled images checked & 6,588 \\
+Missing sampled images & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The validation confirms that counterfactual samples sharing the same base operating state preserve identical physical-state metadata while varying only the hidden visual regime \(Z\) and language objective \(L\). This property is important for leakage-controlled training and for testing whether learned models respond to objective and hidden-context changes.
+
+\section{Counterfactual Organization}
+\label{supp:counterfactual_organization}
+
+EVLA is organized around groups of samples that share the same explicit physical state. For each retained base operating state, the numerical state \(S\) is fixed, while the hidden visual regime \(Z\in\{0,1,2\}\) and language objective \(L\) are varied independently. This produces 15 samples per base state:
+\[
+    3 \ \text{hidden visual regimes}
+    \times
+    5 \ \text{language objectives}
+    =
+    15 \ \text{counterfactual worlds}.
+\]
+The objective of this design is to separate physical-state dependence from modality dependence. A model cannot infer the language objective from the physical state alone because language is sampled independently. Similarly, hidden-regime information is not given as a numerical input to the learned model; it is available only through the energy-field image.
+
+\section{Supplementary Oracle Details}
+\label{supp:oracle_details}
+
+The oracle generates a 16-step battery-action trajectory for each tuple \((S,Z,L)\). Candidate action sequences are sampled, rolled out under regime-dependent dynamics, scored using objective-dependent costs, filtered for physical limits and smoothness, and stored as the reference trajectory. The five language-objective classes induce different preferences:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Energy saving:} favors cost-reducing actions while respecting state-of-charge limits and smoothness.
+    \item \textbf{Comfort:} favors actions that support indoor-condition regulation and reduce thermal discomfort.
+    \item \textbf{Balanced operation:} combines energy cost, comfort, battery cycling, and action smoothness without strongly prioritizing a single term.
+    \item \textbf{Grid support:} favors actions that reduce stress during grid-support periods and shift energy use away from unfavorable operating windows.
+    \item \textbf{Eco operation:} favors low-impact operation while maintaining feasibility and avoiding excessive cycling.
+\end{itemize}
+
+These scenarios are not intended to represent certified closed-loop building control. Their role is to provide a controlled oracle for multimodal trajectory-prediction experiments.
+
+\section{Complementary Qualitative Diagnostics}
+\label{supp:qualitative_diagnostics}
+
+The main manuscript reports the principal dataset figures. This section provides additional qualitative diagnostics to help inspect the relationship between energy-field observations and oracle action trajectories.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{fig_current_sample_energy_fields_and_actions.png}
+\caption{Representative EVLA energy-field observations and corresponding 16-step action trajectories.}
+\label{fig:supp_energy_fields_actions}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{fig_dataset_causal_validation.png}
+\caption{Complementary diagnostic used to inspect the controlled multimodal construction.}
+\label{fig:supp_causal_validation}
+\end{figure}
+
+\section{Complete Ablation Tables}
+\label{supp:complete_ablation_tables}
+
+The main manuscript reports the principal ablation summaries and discusses the main trends. This section provides the complete configuration-level and seed-level result tables supporting those summaries. These tables are included only as supplementary evidence and are not repeated in the main manuscript.
+
+\clearpage
+\input{tables/tab_latest_36_full}
+
+\clearpage
+\input{tables/tab_latest_seed_108_full}
+
+\section{Computing Environment}
+\label{supp:environment}
+
+Table~\ref{tab:supp_environment} reports the hardware and software environment used for the EVLA experiments. The same workstation and software stack were used for the reported ablation runs to keep runtime and inference-time comparisons consistent.
+
+\begin{table}[t]
+\centering
+\caption{Hardware and software environment used for the EVLA experiments.}
+\label{tab:supp_environment}
+\begin{tabular}{ll}
+\toprule
+Component & Configuration \\
+\midrule
+Operating system & Ubuntu 22.04.5 LTS \\
+CPU & Intel Core Ultra 9 275HX \\
+Logical CPUs & 24 \\
+System memory & 62~GiB RAM \\
+GPU & NVIDIA GeForce RTX 5090 GPU \\
+GPU memory & 24~GB \\
+NVIDIA driver & 580.159.03 \\
+Driver-reported CUDA & 13.0 \\
+Python & 3.10.12 \\
+PyTorch & 2.9.1+cu128 \\
+PyTorch CUDA & 12.8 \\
+NumPy & 1.26.4 \\
+pandas & 2.3.3 \\
+scikit-learn & 1.7.2 \\
+Pillow & 12.0.0 \\
+OpenCV & 4.13.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Reproducibility Checklist}
+\label{supp:checklist}
+
+For archival release, the EVLA artifact package should include:
+\begin{itemize}[leftmargin=*]
+    \item manuscript source files and bibliography;
+    \item dataset metadata and validation summaries;
+    \item source CSV tables used to generate reported figures;
+    \item representative sample records;
+    \item aggregated and seed-level ablation results;
+    \item model configuration files;
+    \item train, validation, and test split identifiers or hashes;
+    \item environment information and dependency versions;
+    \item figure-generation and table-generation scripts;
+    \item dataset and code license information.
+\end{itemize}
+
+These artifacts are intended to make the benchmark inspectable and reproducible while keeping the main manuscript focused on the scientific contribution.
+
+\end{document}

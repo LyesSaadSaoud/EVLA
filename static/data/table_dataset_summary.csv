@@ -1,0 +1,14 @@
+metric,value
+samples_scanned,6588045
+base_states_unique_group_id,439203
+expected_samples_from_base_x15,6588045
+expansion_factor,15.0
+bad_json_files,0
+missing_state_files,0
+trajectory_len_not_16,0
+groups_with_inconsistent_soc_T_in,0
+soc_unique_count,7496
+T_in_unique_count,6645
+images_checked,6588
+missing_images,0
+is_current_expected_EVLA,True

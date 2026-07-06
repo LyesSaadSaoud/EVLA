@@ -1,0 +1,32 @@
+{
+  "version": "EVLA_v3.1",
+  "causal_graph": "A = f(S,Z,L); Z\u22a5S; L\u22a5S; Z interacts (not additive)",
+  "Z_encoding": "spatial texture (frequency-encoded, not intensity block)",
+  "L_independence": "eco uses random solar_phase, not hour from state",
+  "Z_effect": "multiplicative interaction \u2014 modifies action direction",
+  "Z_values": {
+    "0": "low_hidden_thermal",
+    "1": "neutral_hidden_thermal",
+    "2": "high_hidden_thermal"
+  },
+  "L_values": [
+    "energy_saving",
+    "comfort",
+    "balanced",
+    "grid_support",
+    "eco"
+  ],
+  "multi_world_factor": 15,
+  "ood_protocol": "id_train: Z\u2208{0,1} | ood_test: Z={2}",
+  "seq_len": 16,
+  "max_appliances": 9,
+  "validation": {
+    "var_given_state": 0.0716090053319931,
+    "var_language": 0.0377797856926918,
+    "var_Z": 0.015207973308861256,
+    "causal_sensitivity_Z": 0.4225945740938187,
+    "causal_sensitivity_L": 0.3901318348944187,
+    "Z_sign_flip_rate": 0.4033333333333333,
+    "eco_hour_independence": 0.014094850583887323
+  }
+}
