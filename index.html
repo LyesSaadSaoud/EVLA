@@ -158,17 +158,25 @@
     </section>
 
     <section class="section figure-section">
-      <p class="section-kicker">Model</p>
-      <h2>Multimodal trajectory prediction architecture</h2>
-      <p class="centered-text">
-        The benchmark model fuses an image encoder, a language encoder, and a state encoder before decoding a
-        16-step battery-action trajectory. It is an evaluation model, not a certified deployment controller.
-      </p>
-      <figure class="wide-figure">
-        <img src="static/images/evla_data.png" alt="EVLA multimodal architecture">
-        <figcaption>EVLA model architecture for intent-conditioned battery-action trajectory prediction.</figcaption>
-      </figure>
-    </section>
+  <p class="section-kicker">Dataset Generation</p>
+  <h2>Physics-grounded EVLA data construction pipeline</h2>
+  <p class="centered-text">
+    EVLA is built from processed residential CSV files collected from 19 houses. Each valid
+    300-sample sliding window is converted into an RGB energy-field representation, paired
+    with an explicit physical state vector, expanded across hidden visual-energy regimes and
+    language objectives, and labeled using a sampling-based shooting-MPC oracle to produce
+    a 16-step battery-action trajectory.
+  </p>
+
+  <figure class="wide-figure">
+    <img src="static/images/EVLA_data.png" alt="EVLA dataset generation pipeline">
+    <figcaption>
+      EVLA dataset generation pipeline. Processed residential time-series windows are transformed
+      into multimodal tuples containing the energy-field image V, physical state S, language
+      objective L, hidden visual-energy regime Z, and oracle battery-action trajectory A.
+    </figcaption>
+  </figure>
+</section>
 
     <section class="section" id="results">
       <p class="section-kicker">Results</p>
