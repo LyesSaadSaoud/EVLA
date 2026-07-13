@@ -13,276 +13,101 @@
   <link rel="stylesheet" href="static/css/index.css">
 </head>
 <body>
+  <div class="animated-bg" aria-hidden="true"><span class="orb orb-one"></span><span class="orb orb-two"></span><span class="orb orb-three"></span></div>
   <header class="site-header">
     <nav class="nav">
-      <a class="brand" href="#top">EVLA</a>
+      <a class="brand" href="#top" aria-label="EVLA home"><span class="brand-mark">E</span><span>EVLA</span></a>
       <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false">Menu</button>
-      <div class="nav-links">
-        <a href="#overview">Overview</a>
-        <a href="#dataset">Dataset</a>
-        <a href="#results">Results</a>
-        <a href="#release">Release</a>
-        <a href="#citation">Citation</a>
-      </div>
+      <div class="nav-links"><a href="#overview">Overview</a><a href="#dataset">Dataset</a><a href="#validation">Validation</a><a href="#results">Results</a><a href="#release">Release</a><a href="#citation">Citation</a></div>
     </nav>
   </header>
 
   <main id="top">
-    <section class="hero">
+    <section class="hero reveal">
       <div class="hero-content">
         <p class="eyebrow">Physics-grounded multimodal benchmark</p>
         <h1>Energy Vision-Language-Action for Residential Energy Management</h1>
-        <p class="lead">
-          EVLA studies how energy-field perception, explicit physical state, and natural-language objectives
-          can be mapped to short-horizon battery-action trajectories.
-        </p>
+        <p class="lead">EVLA studies how energy-field perception, explicit physical state, and natural-language objectives can be mapped to short-horizon battery-action trajectories.</p>
         <p class="authors">Lyes Saad Saoud, Oualid Doukhi, and collaborators</p>
         <p class="affiliation">CINSER, Chicago State University, and collaborating institutions</p>
         <div class="button-row">
-          <a class="button primary" href="static/paper/EVLA_paper.pdf">Paper PDF</a>
-          <a class="button" href="static/paper/EVLA_supplementary_material.tex">Supplementary</a>
-          <a class="button" href="https://github.com/USER/EVLA" target="_blank" rel="noopener">Code</a>
-          <a class="button" href="https://huggingface.co/datasets/USER/EVLA" target="_blank" rel="noopener">Hugging Face</a>
-          <a class="button" href="https://zenodo.org/records/EVLA_DOI" target="_blank" rel="noopener">Zenodo</a>
-          <a class="button" href="https://www.csu.edu/" target="_blank" rel="noopener">CSU Catalog</a>
+          <a class="button primary" href="https://arxiv.org/abs/ARXIV_ID" target="_blank" rel="noopener">arXiv Paper</a>
+          <a class="button" href="https://arxiv.org/pdf/ARXIV_ID" target="_blank" rel="noopener">Paper PDF</a>
+          <a class="button" href="https://arxiv.org/src/ARXIV_ID/anc/EAAI-Supplementary-Material.pdf" target="_blank" rel="noopener">Supplementary PDF</a>
+          <a class="button" href="https://github.com/LyesSaadSaoud/EVLA-Energy" target="_blank" rel="noopener">Code</a>
+          <a class="button" href="https://huggingface.co/datasets/saadsaoudlyes/EVLA" target="_blank" rel="noopener">Dataset</a>
         </div>
+        <p class="release-note">Dataset status: private during review; planned public release after manuscript acceptance.</p>
       </div>
-      <div class="hero-figure">
-        <img src="static/images/evla_main.png" alt="EVLA formulation diagram">
-      </div>
+      <div class="hero-figure float-card"><img src="static/images/evla_main.png" alt="EVLA formulation diagram"><div class="figure-glow" aria-hidden="true"></div></div>
     </section>
 
-    <section class="section stats-section" aria-label="EVLA benchmark summary">
+    <section class="section stats-section reveal" aria-label="EVLA benchmark summary">
       <div class="stats-grid">
-        <div class="stat-card">
-          <span class="stat-value">6,588,045</span>
-          <span class="stat-label">multimodal samples</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">439,203</span>
-          <span class="stat-label">base operating states</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">3 x 5</span>
-          <span class="stat-label">hidden regimes and objectives</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">16</span>
-          <span class="stat-label">battery-action steps</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">108</span>
-          <span class="stat-label">reported ablation runs</span>
-        </div>
+        <div class="stat-card"><span class="stat-value count-up" data-target="6588045">6,588,045</span><span class="stat-label">multimodal samples</span></div>
+        <div class="stat-card"><span class="stat-value count-up" data-target="439203">439,203</span><span class="stat-label">base operating states</span></div>
+        <div class="stat-card"><span class="stat-value">3 × 5</span><span class="stat-label">hidden regimes and objectives</span></div>
+        <div class="stat-card"><span class="stat-value">16</span><span class="stat-label">battery-action steps</span></div>
+        <div class="stat-card"><span class="stat-value">108</span><span class="stat-label">reported ablation runs</span></div>
       </div>
     </section>
 
-    <section class="section two-column" id="overview">
+    <section class="section two-column reveal" id="overview">
       <div>
         <p class="section-kicker">Overview</p>
         <h2>From energy context and user intent to battery-control trajectories</h2>
-        <p>
-          EVLA adapts the Vision-Language-Action idea to a non-robotic cyber-physical energy setting.
-          Each sample combines an RGB energy-field representation, a physical state vector, a natural-language
-          objective, and a 16-step battery-action reference generated by a physics-consistent shooting-MPC oracle.
-        </p>
-        <p>
-          The benchmark is built around the controlled relation <strong>A = f(S, Z, L)</strong>, where
-          <strong>S</strong> is the explicit physical state, <strong>Z</strong> is a hidden visual-energy regime,
-          <strong>L</strong> is the language objective, and <strong>A</strong> is the action trajectory.
-        </p>
+        <p>EVLA adapts the Vision-Language-Action idea to a non-robotic cyber-physical energy setting. Each sample combines an RGB energy-field representation, a physical state vector, a natural-language objective, and a 16-step battery-action reference generated by a physics-consistent shooting-MPC oracle.</p>
+        <p>The benchmark is built around the controlled relation <strong>A = f(S, Z, L)</strong>, where <strong>S</strong> is the explicit physical state, <strong>Z</strong> is a hidden visual-energy regime, <strong>L</strong> is the language objective, and <strong>A</strong> is the action trajectory.</p>
       </div>
-      <div class="info-panel">
-        <h3>Sample contents</h3>
-        <ul class="clean-list">
-          <li>RGB energy-field image</li>
-          <li>Physical state: price, SOC, indoor temperature, hour</li>
-          <li>Language objective: energy saving, comfort, balanced, grid support, eco</li>
-          <li>16-step normalized battery-action trajectory</li>
-          <li>Metadata for controlled counterfactual grouping</li>
-        </ul>
-      </div>
+      <div class="info-panel"><h3>Sample contents</h3><ul class="clean-list"><li>RGB energy-field image</li><li>Physical state: price, SOC, indoor temperature, hour</li><li>Language objective: energy saving, comfort, balanced, grid support, eco</li><li>16-step normalized battery-action trajectory</li><li>Metadata for controlled counterfactual grouping</li></ul></div>
     </section>
 
-    <section class="section figure-section" id="dataset">
-      <p class="section-kicker">Dataset construction</p>
-      <h2>Balanced counterfactual multi-world expansion</h2>
-      <p class="centered-text">
-        Each retained operating state is expanded across three hidden visual-energy regimes and five language
-        objectives, producing 15 counterfactual worlds per base state while preserving the same explicit state.
-      </p>
-      <figure class="wide-figure">
-        <img src="static/images/dataset_multiworld_flow.png" alt="EVLA multi-world dataset expansion flow">
-        <figcaption>EVLA expands base operating states into multimodal counterfactual worlds.</figcaption>
-      </figure>
-      <figure class="wide-figure">
-        <img src="static/images/z_objective_multiworld_matrix.png" alt="Balanced Z by L multi-world expansion matrix">
-        <figcaption>Balanced hidden-regime and language-objective construction. Each cell contains 439,203 samples.</figcaption>
-      </figure>
+    <section class="section figure-section reveal" id="dataset">
+      <p class="section-kicker">Dataset construction</p><h2>Balanced counterfactual multi-world expansion</h2>
+      <p class="centered-text">Each retained operating state is expanded across three hidden visual-energy regimes and five language objectives, producing 15 counterfactual worlds per base state while preserving the same explicit state.</p>
+      <figure class="wide-figure"><img src="static/images/dataset_multiworld_flow.png" alt="EVLA multi-world dataset expansion flow"><figcaption>EVLA expands base operating states into multimodal counterfactual worlds.</figcaption></figure>
+      <figure class="wide-figure"><img src="static/images/z_objective_multiworld_matrix.png" alt="Balanced Z by L multi-world expansion matrix"><figcaption>Balanced hidden-regime and language-objective construction. Each cell contains 439,203 samples.</figcaption></figure>
     </section>
 
-    <section class="section">
-      <p class="section-kicker">Energy-field observations</p>
-      <h2>Visual modality for latent energy context</h2>
-      <p class="centered-text">
-        EVLA does not use ordinary camera scenes. The visual input is an energy-field representation designed to
-        encode hidden operating context through image texture while keeping the explicit state fixed.
-      </p>
-      <figure class="wide-figure">
-        <img src="static/images/energy_field_gallery.png" alt="Representative EVLA energy-field samples">
-        <figcaption>Representative energy-field samples across hidden regimes and language objectives.</figcaption>
-      </figure>
+    <section class="section reveal">
+      <p class="section-kicker">Energy-field observations</p><h2>Visual modality for latent energy context</h2>
+      <p class="centered-text">EVLA does not use ordinary camera scenes. The visual input is an energy-field representation designed to encode hidden operating context through image texture while keeping the explicit state fixed.</p>
+      <figure class="wide-figure"><img src="static/images/energy_field_gallery.png" alt="Representative EVLA energy-field samples"><figcaption>Representative energy-field samples across hidden regimes and language objectives.</figcaption></figure>
     </section>
 
-    <section class="section two-column">
-      <div>
-        <p class="section-kicker">Validation</p>
-        <h2>Structural checks for reproducibility</h2>
-        <p>
-          The release report checks the integrity of the generated benchmark: malformed JSON files, missing state
-          files, trajectory-length errors, inconsistent SOC or indoor-temperature assignments across counterfactual
-          groups, and sampled missing images.
-        </p>
-        <div class="validation-grid">
-          <div><strong>0</strong><span>bad JSON files</span></div>
-          <div><strong>0</strong><span>missing state files</span></div>
-          <div><strong>0</strong><span>trajectory-length errors</span></div>
-          <div><strong>0</strong><span>inconsistent SOC/Tin groups</span></div>
-          <div><strong>0 / 6,588</strong><span>missing sampled images</span></div>
-        </div>
-      </div>
-      <figure class="card-figure">
-        <img src="static/images/state_distributions.png" alt="Physical-state distributions in EVLA">
-        <figcaption>Physical-state distributions for SOC, indoor temperature, price, and hour.</figcaption>
-      </figure>
+    <section class="section two-column reveal" id="validation">
+      <div><p class="section-kicker">Validation</p><h2>Structural checks for reproducibility</h2><p>The release report checks the integrity of the generated benchmark: malformed JSON files, missing state files, trajectory-length errors, inconsistent SOC or indoor-temperature assignments across counterfactual groups, and sampled missing images.</p><div class="validation-grid"><div><strong>0</strong><span>bad JSON files</span></div><div><strong>0</strong><span>missing state files</span></div><div><strong>0</strong><span>trajectory-length errors</span></div><div><strong>0</strong><span>inconsistent SOC/Tin groups</span></div><div><strong>0 / 6,588</strong><span>missing sampled images</span></div></div></div>
+      <figure class="card-figure"><img src="static/images/state_distributions.png" alt="Physical-state distributions in EVLA"><figcaption>Physical-state distributions for SOC, indoor temperature, price, and hour.</figcaption></figure>
     </section>
 
-    <section class="section figure-section">
-  <p class="section-kicker">Dataset Generation</p>
-  <h2>Physics-grounded EVLA data construction pipeline</h2>
-  <p class="centered-text">
-    EVLA is built from processed residential CSV files collected from 19 houses. Each valid
-    300-sample sliding window is converted into an RGB energy-field representation, paired
-    with an explicit physical state vector, expanded across hidden visual-energy regimes and
-    language objectives, and labeled using a sampling-based shooting-MPC oracle to produce
-    a 16-step battery-action trajectory.
-  </p>
-
-  <figure class="wide-figure">
-    <img src="static/images/EVLA_data.png" alt="EVLA dataset generation pipeline">
-    <figcaption>
-      EVLA dataset generation pipeline. Processed residential time-series windows are transformed
-      into multimodal tuples containing the energy-field image V, physical state S, language
-      objective L, hidden visual-energy regime Z, and oracle battery-action trajectory A.
-    </figcaption>
-  </figure>
-</section>
-
-    <section class="section" id="results">
-      <p class="section-kicker">Results</p>
-      <h2>Main empirical findings</h2>
-      <div class="result-grid">
-        <article class="result-card">
-          <h3>Language is essential</h3>
-          <p>
-            Removing language or using state-only input increases error substantially, showing that user intent is
-            not a decorative label. It changes the target battery-action trajectory.
-          </p>
-        </article>
-        <article class="result-card">
-          <h3>Compact vision backbones are competitive</h3>
-          <p>
-            MobileNet provides a strong accuracy-efficiency tradeoff in the current evaluation, while larger
-            visual backbones do not clearly improve aggregate MSE.
-          </p>
-        </article>
-        <article class="result-card">
-          <h3>Vision encodes hidden context</h3>
-          <p>
-            Hidden regimes shift oracle action statistics, but the aggregate learned-model MSE gain from vision is
-            modest in the present release. This is stated directly to avoid overclaiming.
-          </p>
-        </article>
-      </div>
-      <div class="figure-grid">
-        <figure class="card-figure">
-          <img src="static/images/trajectory_by_objective.png" alt="Mean oracle trajectories by objective">
-          <figcaption>Language-conditioned oracle action profiles.</figcaption>
-        </figure>
-        <figure class="card-figure">
-          <img src="static/images/backbone_mse.png" alt="Backbone-selection MSE">
-          <figcaption>Backbone-selection MSE over three random seeds.</figcaption>
-        </figure>
-        <figure class="card-figure">
-          <img src="static/images/modality_ablation.png" alt="MobileNet modality ablation">
-          <figcaption>MobileNet modality ablation.</figcaption>
-        </figure>
-      </div>
+    <section class="section figure-section reveal">
+      <p class="section-kicker">Dataset generation</p><h2>Physics-grounded EVLA data construction pipeline</h2>
+      <p class="centered-text">EVLA is built from processed residential CSV files collected from 19 houses. Each valid 300-sample sliding window is converted into an RGB energy-field representation, paired with an explicit physical state vector, expanded across hidden visual-energy regimes and language objectives, and labeled using a sampling-based shooting-MPC oracle to produce a 16-step battery-action trajectory.</p>
+      <figure class="wide-figure"><img src="static/images/EVLA_data.png" alt="EVLA dataset generation pipeline"><figcaption>EVLA dataset generation pipeline. Processed residential time-series windows are transformed into multimodal tuples containing the energy-field image V, physical state S, language objective L, hidden visual-energy regime Z, and oracle battery-action trajectory A.</figcaption></figure>
     </section>
 
-    <section class="section release-section" id="release">
-      <p class="section-kicker">Release plan</p>
-      <h2>Where each EVLA artifact should live</h2>
-      <div class="release-grid">
-        <article>
-          <h3>GitHub</h3>
-          <p>Code, scripts, website, small sample data, reproducibility instructions, issues, releases, and changelog.</p>
-          <a href="https://github.com/USER/EVLA" target="_blank" rel="noopener">Repository placeholder</a>
-        </article>
-        <article>
-          <h3>Hugging Face</h3>
-          <p>Full benchmark dataset, dataset card, sample viewer, loading examples, and optional model checkpoints.</p>
-          <a href="https://huggingface.co/datasets/USER/EVLA" target="_blank" rel="noopener">Dataset placeholder</a>
-        </article>
-        <article>
-          <h3>Zenodo</h3>
-          <p>Versioned archival DOI for paper artifacts, dataset metadata, validation logs, and frozen release snapshots.</p>
-          <a href="https://zenodo.org/records/EVLA_DOI" target="_blank" rel="noopener">DOI placeholder</a>
-        </article>
-        <article>
-          <h3>CSU catalog</h3>
-          <p>Institutional landing page or catalog entry for university visibility, ownership clarity, and long-term discoverability.</p>
-          <a href="https://www.csu.edu/" target="_blank" rel="noopener">CSU placeholder</a>
-        </article>
-      </div>
+    <section class="section reveal" id="results">
+      <p class="section-kicker">Results</p><h2>Main empirical findings</h2>
+      <div class="result-grid"><article class="result-card"><h3>Language is essential</h3><p>Removing language or using state-only input increases error substantially, showing that user intent is not a decorative label. It changes the target battery-action trajectory.</p></article><article class="result-card"><h3>Compact vision backbones are competitive</h3><p>MobileNet provides a strong accuracy-efficiency tradeoff in the current evaluation, while larger visual backbones do not clearly improve aggregate MSE.</p></article><article class="result-card"><h3>Vision encodes hidden context</h3><p>Hidden regimes shift oracle action statistics, but the aggregate learned-model MSE gain from vision is modest in the present release. This is stated directly to avoid overclaiming.</p></article></div>
+      <div class="figure-grid"><figure class="card-figure"><img src="static/images/trajectory_by_objective.png" alt="Mean oracle trajectories by objective"><figcaption>Language-conditioned oracle action profiles.</figcaption></figure><figure class="card-figure"><img src="static/images/backbone_mse.png" alt="Backbone-selection MSE"><figcaption>Backbone-selection MSE over three random seeds.</figcaption></figure><figure class="card-figure"><img src="static/images/modality_ablation.png" alt="MobileNet modality ablation"><figcaption>MobileNet modality ablation.</figcaption></figure></div>
     </section>
 
-    <section class="section">
-      <p class="section-kicker">News</p>
-      <h2>Updates</h2>
-      <div class="timeline">
-        <div>
-          <time>2026-07-06</time>
-          <p>EVLA v3.1 paper export prepared with validated dataset summary, active figures, tables, and ablation bundle.</p>
-        </div>
-        <div>
-          <time>Coming soon</time>
-          <p>Public GitHub repository, Hugging Face dataset card, Zenodo DOI, and CSU catalog entry.</p>
-        </div>
-      </div>
+    <section class="section release-section reveal" id="release">
+      <p class="section-kicker">Release plan</p><h2>Where each EVLA artifact lives</h2>
+      <div class="release-grid"><article><h3>arXiv</h3><p>Paper preprint and supplementary material as an ancillary file.</p><a href="https://arxiv.org/abs/ARXIV_ID" target="_blank" rel="noopener">Paper placeholder</a></article><article><h3>GitHub</h3><p>Code, scripts, website, small sample data, reproducibility instructions, issues, releases, and changelog.</p><a href="https://github.com/LyesSaadSaoud/EVLA-Energy" target="_blank" rel="noopener">EVLA-Energy repository</a></article><article><h3>Hugging Face</h3><p>Full benchmark dataset, dataset card, loading examples, and optional model checkpoints.</p><a href="https://huggingface.co/datasets/saadsaoudlyes/EVLA" target="_blank" rel="noopener">EVLA dataset</a></article><article><h3>Zenodo</h3><p>Versioned archival DOI for paper artifacts, dataset metadata, validation logs, and frozen release snapshots.</p><a href="#" aria-disabled="true">Coming soon</a></article></div>
     </section>
 
-    <section class="section citation-section" id="citation">
-      <p class="section-kicker">Citation</p>
-      <h2>BibTeX</h2>
-      <pre><code id="bibtex">@article{saoud2026evla,
+    <section class="section reveal"><p class="section-kicker">News</p><h2>Updates</h2><div class="timeline"><div><time>2026-07</time><p>Initial EVLA paper and supplementary package prepared for submission with validated dataset summary, active figures, tables, and ablation bundle.</p></div><div><time>During review</time><p>Hugging Face dataset remains private or restricted; public release is planned after acceptance.</p></div><div><time>Coming soon</time><p>arXiv paper link, supplementary ancillary link, Zenodo DOI, and final public dataset release.</p></div></div></section>
+
+    <section class="section citation-section reveal" id="citation"><p class="section-kicker">Citation</p><h2>BibTeX</h2><pre><code id="bibtex">@article{saoud2026evla,
   title = {Energy Vision-Language-Action: A Physics-Grounded Multimodal Benchmark for Intent-Conditioned Residential Energy Management},
   author = {Saoud, Lyes Saad and Doukhi, Oualid and Coauthors},
   journal = {Preprint},
   year = {2026},
-  note = {Dataset, code, and licensing information to be updated in the final release}
-}</code></pre>
-      <button class="copy-button" data-copy-target="bibtex">Copy BibTeX</button>
-    </section>
+  note = {Initial EVLA dataset release}
+}</code></pre><button class="copy-button" data-copy-target="bibtex">Copy BibTeX</button></section>
   </main>
-
-  <footer class="footer">
-    <p>
-      EVLA is a benchmark and reproducibility package for energy decision learning. It is not a certified
-      deployment-ready residential controller.
-    </p>
-  </footer>
-
+  <footer class="footer"><p>EVLA is a benchmark and reproducibility package for energy decision learning. It is not a certified deployment-ready residential controller.</p></footer>
   <script src="static/js/index.js"></script>
 </body>
 </html>
