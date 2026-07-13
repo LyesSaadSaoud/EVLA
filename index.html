@@ -1,488 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="EVLA: Energy Vision-Language-Action benchmark for physics-grounded, intent-conditioned residential energy management.">
-  <meta name="keywords" content="EVLA, Energy Vision-Language-Action, residential energy management, multimodal benchmark, battery scheduling, model predictive control, energy AI">
-  <meta property="og:title" content="EVLA: Energy Vision-Language-Action">
-  <meta property="og:description" content="A physics-grounded multimodal benchmark for intent-conditioned residential energy management.">
-  <meta property="og:image" content="static/images/evla_main.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <title>EVLA — Energy Vision-Language-Action Benchmark</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="EVLA: Energy Vision-Language-Action benchmark for physics-grounded, intent-conditioned residential energy management.">
+<meta name="keywords" content="EVLA, Energy Vision-Language-Action, residential energy management, multimodal benchmark, battery scheduling, model predictive control, energy AI">
+<meta property="og:title" content="EVLA: Energy Vision-Language-Action">
+<meta property="og:description" content="A physics-grounded multimodal benchmark for intent-conditioned residential energy management.">
+<meta property="og:image" content="static/images/evla_main.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>EVLA — Energy Vision-Language-Action Benchmark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#eef3fa; --paper-2:#e6edf6; --white:#ffffff;
+  --ink:#0c1a2e; --ink-soft:#3d4d66; --ink-faint:#7a8aa3;
+  --grid:rgba(24,58,110,.06); --grid-2:rgba(24,58,110,.11);
+  --line:rgba(24,58,110,.14); --line-2:rgba(24,58,110,.24);
+  --hot:#ff3d68;      /* charge / hot signal   */
+  --cool:#0a84ff;     /* grid / cool signal    */
+  --volt:#6b47ff;     /* language / intent     */
+  --pos:#00a878;      /* validated / positive  */
+  --maxw:940px; --rail:264px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --shadow:0 22px 50px -34px rgba(12,30,70,.55);
+  --shadow-sm:0 10px 26px -20px rgba(12,30,70,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"IBM Plex Sans",system-ui,sans-serif;color:var(--ink);line-height:1.62;
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(var(--grid-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-2) 1px, transparent 1px);
+  background-size:26px 26px, 26px 26px, 130px 130px, 130px 130px;
+  background-position:-1px -1px, -1px -1px, -1px -1px, -1px -1px;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:var(--volt);color:#fff}
+h1,h2,h3,.display{font-family:"Bricolage Grotesque",sans-serif;line-height:1.02;letter-spacing:-.02em;font-weight:700}
+.mono{font-family:"IBM Plex Mono",monospace}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+strong{color:var(--ink);font-weight:600}
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+/* ---------------- Rail ---------------- */
+.rail{position:fixed;top:0;left:0;bottom:0;width:var(--rail);z-index:40;
+  padding:30px 26px;display:flex;flex-direction:column;gap:26px;
+  border-right:1px solid var(--line);background:rgba(238,243,250,.72);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:11px;font-family:"Bricolage Grotesque";font-weight:800;font-size:1.2rem;letter-spacing:-.03em}
+.brand-mark{width:36px;height:36px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:800;
+  background:linear-gradient(135deg,var(--hot),var(--volt) 55%,var(--cool));box-shadow:0 8px 18px -8px var(--volt)}
+.rail-tag{font-family:"IBM Plex Mono";font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);margin-top:-14px;padding-left:47px}
+.index{list-style:none;display:flex;flex-direction:column;gap:2px;margin-top:4px}
+.index a{display:flex;align-items:baseline;gap:12px;padding:8px 10px;border-radius:9px;color:var(--ink-soft);
+  font-size:.92rem;transition:background .2s,color .2s,padding .25s var(--ease)}
+.index a .n{font-family:"IBM Plex Mono";font-size:.72rem;color:var(--ink-faint);transition:color .2s}
+.index a:hover{background:rgba(24,58,110,.05);color:var(--ink)}
+.index a.active{background:var(--white);color:var(--ink);padding-left:16px;box-shadow:var(--shadow-sm)}
+.index a.active .n{color:var(--cool)}
+.rail-foot{margin-top:auto;font-size:.74rem;color:var(--ink-faint);line-height:1.5}
+.rail-foot a{color:var(--cool);font-family:"IBM Plex Mono";font-size:.72rem}
 
-  <style>
-    :root{
-      /* Base surfaces — deep grid-at-night */
-      --bg:#080b16;
-      --bg-2:#0c1122;
-      --surface:#111834;
-      --surface-2:#161f42;
-      --line:rgba(140,160,220,.14);
-      --line-strong:rgba(140,160,220,.28);
+.topbar{display:none}
 
-      /* Text */
-      --text:#eef1fb;
-      --muted:#9aa6cc;
-      --faint:#6b779e;
+/* ---------------- Layout ---------------- */
+.main{margin-left:var(--rail);max-width:calc(var(--maxw) + 96px);padding:0 48px}
+.section{padding:92px 0;border-top:1px solid var(--line)}
+.section.hero{padding:76px 0 60px;border-top:none}
+.kicker{font-family:"IBM Plex Mono";font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:var(--cool);
+  display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.kicker .idx{color:var(--ink-faint)}
+.kicker::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line-2),transparent);max-width:180px}
+h2{font-size:clamp(1.7rem,3.6vw,2.5rem);margin-bottom:16px;font-weight:700}
+.section > p{color:var(--ink-soft);font-size:1.04rem;max-width:70ch}
+.centered{max-width:74ch;color:var(--ink-soft);margin-bottom:34px}
 
-      /* The A = f(S, Z, L) accent language */
-      --charge:#ffb020;   /* S — physical state / charge  */
-      --grid:#34e4ea;     /* Z — vision / grid-flow       */
-      --intent:#8b7bff;   /* L — language / intent        */
-      --action:#ff6b9d;   /* A — the produced trajectory  */
+/* ---------------- Hero ---------------- */
+.hero h1{font-size:clamp(2.3rem,5.6vw,3.9rem);font-weight:800;margin-bottom:20px;max-width:16ch}
+.hero h1 .g{background:linear-gradient(100deg,var(--hot),var(--volt) 52%,var(--cool));-webkit-background-clip:text;background-clip:text;color:transparent}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:"IBM Plex Mono";font-size:.74rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ink-soft);background:var(--white);border:1px solid var(--line);
+  padding:8px 15px;border-radius:999px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.eyebrow .live{width:7px;height:7px;border-radius:50%;background:var(--pos);box-shadow:0 0 0 0 var(--pos);animation:ping 2.2s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(0,168,120,.5)}70%{box-shadow:0 0 0 9px rgba(0,168,120,0)}100%{box-shadow:0 0 0 0 rgba(0,168,120,0)}}
+.lead{color:var(--ink-soft);font-size:1.15rem;max-width:54ch;margin-bottom:26px}
 
-      --charge-soft:rgba(255,176,32,.14);
-      --grid-soft:rgba(52,228,234,.14);
-      --intent-soft:rgba(139,123,255,.16);
+.readout{position:relative;background:var(--white);border:1px solid var(--line);border-radius:18px;
+  padding:20px 20px 12px;box-shadow:var(--shadow);margin:6px 0 30px;overflow:hidden}
+.readout-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:8px}
+.readout-title{font-family:"IBM Plex Mono";font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.readout-live{font-family:"IBM Plex Mono";font-size:.74rem;color:var(--hot)}
+.readout-live b{color:var(--ink)}
+.readout svg{width:100%;height:auto;display:block}
+.readout-note{font-family:"IBM Plex Mono";font-size:.68rem;color:var(--ink-faint);text-align:right;padding:2px 2px 0}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-family:"IBM Plex Mono";font-size:.72rem;color:var(--ink-soft);padding:8px 2px 0}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
 
-      --radius:18px;
-      --radius-sm:12px;
-      --maxw:1180px;
-      --ease:cubic-bezier(.22,.61,.36,1);
-      --shadow:0 24px 60px -30px rgba(0,0,0,.8);
-    }
+.eq{display:flex;flex-wrap:wrap;align-items:center;gap:9px;font-family:"IBM Plex Mono";font-size:1rem;margin-bottom:30px}
+.eq .A{color:var(--hot);font-weight:600}.eq .op{color:var(--ink-faint)}
+.tok{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;background:var(--white);
+  border:1px solid var(--line);font-size:.86rem;box-shadow:var(--shadow-sm);transition:transform .2s var(--ease)}
+.tok:hover{transform:translateY(-3px)}
+.tok i{width:9px;height:9px;border-radius:50%}
+.tok.s i{background:var(--cool)}.tok.z i{background:var(--volt)}.tok.l i{background:var(--pos)}
 
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{
-      font-family:"IBM Plex Sans",system-ui,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      line-height:1.6;
-      -webkit-font-smoothing:antialiased;
-      overflow-x:hidden;
-    }
-    ::selection{background:var(--intent);color:#0a0d18}
+.authors{font-size:.98rem;line-height:1.9;margin-bottom:8px}
+.authors sup{font-family:"IBM Plex Mono";font-size:.68em;color:var(--cool);font-weight:600}
+.authors .corr{color:var(--hot)}
+.affil{color:var(--ink-faint);font-size:.83rem;line-height:1.85;max-width:62ch;margin-bottom:6px}
+.affil sup{font-family:"IBM Plex Mono";font-size:.72em;color:var(--cool)}
+.corr-note{color:var(--ink-faint);font-size:.8rem;margin-bottom:26px}.corr-note .corr{color:var(--hot)}
 
-    h1,h2,h3,.display{font-family:"Space Grotesk",sans-serif;letter-spacing:-.02em;line-height:1.05;font-weight:600}
-    .mono{font-family:"IBM Plex Mono",monospace}
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
+.btns{display:flex;flex-wrap:wrap;gap:11px;margin-bottom:20px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 19px;border-radius:11px;font-size:.92rem;font-weight:500;
+  background:var(--white);border:1px solid var(--line);box-shadow:var(--shadow-sm);
+  transition:transform .2s var(--ease),border-color .2s,color .2s}
+.btn:hover{transform:translateY(-2px);border-color:var(--cool);color:var(--cool)}
+.btn.primary{background:linear-gradient(100deg,var(--volt),var(--cool));color:#fff;border:none;box-shadow:0 12px 26px -12px var(--volt)}
+.btn.primary:hover{transform:translateY(-2px);color:#fff}
+.status{font-size:.85rem;color:var(--ink-faint);display:inline-flex;align-items:center;gap:8px}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--hot)}
 
-    /* ---------- Ambient energy field ---------- */
-    #field-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.55;pointer-events:none}
-    .veil{position:fixed;inset:0;z-index:1;pointer-events:none;
-      background:
-        radial-gradient(1100px 700px at 78% -8%, rgba(139,123,255,.18), transparent 60%),
-        radial-gradient(900px 620px at 8% 8%, rgba(52,228,234,.12), transparent 60%),
-        radial-gradient(1000px 900px at 50% 120%, rgba(255,176,32,.10), transparent 55%);
-    }
-    .wrap{position:relative;z-index:2}
+/* ---------------- Stats ---------------- */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--line);border-radius:16px;
+  overflow:hidden;background:var(--white);box-shadow:var(--shadow)}
+.stat{padding:26px 20px;border-right:1px solid var(--line);position:relative}
+.stat:last-child{border-right:none}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cool);transform:scaleY(0);transform-origin:top;transition:transform .5s var(--ease)}
+.stat:hover::before{transform:scaleY(1)}
+.stat .v{font-family:"Bricolage Grotesque";font-size:clamp(1.4rem,2.6vw,1.95rem);font-weight:800;color:var(--ink);display:block}
+.stat .l{font-size:.8rem;color:var(--ink-faint);margin-top:5px;display:block}
 
-    /* ---------- Header ---------- */
-    .site-header{position:sticky;top:0;z-index:50;
-      backdrop-filter:blur(14px);
-      background:linear-gradient(to bottom, rgba(8,11,22,.86), rgba(8,11,22,.5));
-      border-bottom:1px solid var(--line);
-    }
-    .nav{max-width:var(--maxw);margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{display:flex;align-items:center;gap:11px;font-family:"Space Grotesk";font-weight:600;font-size:1.12rem;letter-spacing:.02em}
-    .brand-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;
-      font-weight:700;color:#0a0d18;
-      background:conic-gradient(from 210deg, var(--charge), var(--action), var(--intent), var(--grid), var(--charge));
-      box-shadow:0 0 22px -4px var(--intent);
-    }
-    .nav-links{display:flex;gap:26px;font-size:.92rem;color:var(--muted)}
-    .nav-links a{position:relative;padding:4px 0;transition:color .25s}
-    .nav-links a::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:0;
-      background:linear-gradient(90deg,var(--grid),var(--intent));transition:width .3s var(--ease)}
-    .nav-links a:hover{color:var(--text)}
-    .nav-links a:hover::after{width:100%}
-    .menu-button{display:none;background:transparent;border:1px solid var(--line-strong);color:var(--text);
-      padding:8px 14px;border-radius:10px;font:inherit;font-size:.85rem;cursor:pointer}
+/* ---------------- Two column ---------------- */
+.two{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:start}
+.two p{color:var(--ink-soft);margin-bottom:14px}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:var(--shadow)}
+.panel h3{font-size:1.1rem;margin-bottom:16px;color:var(--ink)}
+.cl{list-style:none;display:flex;flex-direction:column;gap:11px}
+.cl li{position:relative;padding-left:24px;color:var(--ink-soft);font-size:.95rem}
+.cl li::before{content:"";position:absolute;left:0;top:9px;width:9px;height:9px;border-radius:2px;background:var(--cool)}
+.cl li:nth-child(2)::before{background:var(--volt)}.cl li:nth-child(3)::before{background:var(--pos)}
+.cl li:nth-child(4)::before{background:var(--hot)}.cl li:nth-child(5)::before{background:var(--ink-faint)}
 
-    /* ---------- Layout primitives ---------- */
-    main{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-    .section{padding:96px 0;border-top:1px solid var(--line)}
-    .section:first-of-type{border-top:none}
-    .kicker{font-family:"IBM Plex Mono";font-size:.74rem;letter-spacing:.28em;text-transform:uppercase;
-      color:var(--grid);display:inline-flex;align-items:center;gap:9px;margin-bottom:18px}
-    .kicker::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,var(--grid),transparent)}
-    h2{font-size:clamp(1.7rem,3.4vw,2.55rem);margin-bottom:18px}
-    .section > p, .lede{color:var(--muted);font-size:1.05rem;max-width:70ch}
-    .centered{max-width:76ch;margin:0 auto 40px;text-align:center;color:var(--muted)}
+/* ---------------- Figures ---------------- */
+.plate{background:var(--white);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin-top:8px}
+.plate img{width:100%}
+.plate figcaption{font-size:.85rem;color:var(--ink-faint);padding:14px 18px;border-top:1px solid var(--line)}
+.plate + .plate{margin-top:22px}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px}
+.fgrid .plate{margin:0;transition:transform .3s var(--ease)}
+.fgrid .plate:hover{transform:translateY(-5px)}
+.fgrid figcaption{font-size:.8rem;padding:12px 14px}
 
-    /* ---------- Hero ---------- */
-    .hero{padding:74px 0 60px;display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
-    .eyebrow{font-family:"IBM Plex Mono";font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;
-      color:var(--charge);margin-bottom:20px;
-      display:inline-flex;align-items:center;gap:10px;padding:7px 14px;border-radius:999px;
-      border:1px solid var(--line-strong);background:rgba(255,176,32,.06)}
-    .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--charge);box-shadow:0 0 10px var(--charge);animation:pulse 2.4s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-    .hero h1{font-size:clamp(2.2rem,5.2vw,3.7rem);margin-bottom:22px;font-weight:700}
-    .hero h1 .grad{background:linear-gradient(115deg,var(--grid),var(--intent) 55%,var(--action));
-      -webkit-background-clip:text;background-clip:text;color:transparent}
-    .lead{color:var(--muted);font-size:1.14rem;max-width:56ch;margin-bottom:26px}
+/* ---------------- Validation ---------------- */
+.vgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:24px}
+.vgrid > div{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+  display:flex;align-items:center;gap:14px;transition:border-color .3s}
+.vgrid > div:hover{border-color:var(--pos)}
+.vgrid strong{font-family:"Bricolage Grotesque";font-size:1.5rem;color:var(--pos);line-height:1}
+.vgrid span{color:var(--ink-soft);font-size:.83rem}
+.vgrid .check{width:22px;height:22px;border-radius:50%;background:rgba(0,168,120,.12);display:grid;place-items:center;color:var(--pos);font-size:.8rem;flex-shrink:0}
 
-    /* equation chip line */
-    .equation{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 30px;font-family:"IBM Plex Mono";font-size:1.05rem}
-    .eq-A{color:var(--action);font-weight:600}
-    .eq-op{color:var(--faint)}
-    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 13px;border-radius:999px;
-      border:1px solid var(--line-strong);font-size:.9rem;font-weight:500;background:var(--surface);
-      transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
-    .chip:hover{transform:translateY(-3px)}
-    .chip .k{width:9px;height:9px;border-radius:50%}
-    .chip.s .k{background:var(--charge)} .chip.s:hover{box-shadow:0 8px 22px -10px var(--charge)}
-    .chip.z .k{background:var(--grid)} .chip.z:hover{box-shadow:0 8px 22px -10px var(--grid)}
-    .chip.l .k{background:var(--intent)} .chip.l:hover{box-shadow:0 8px 22px -10px var(--intent)}
+/* ---------------- Results ---------------- */
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:6px 0}
+.rcard{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:26px 22px;box-shadow:var(--shadow);
+  position:relative;transition:transform .3s var(--ease),border-color .3s;overflow:hidden}
+.rcard:hover{transform:translateY(-6px);border-color:var(--line-2)}
+.rcard .tag{font-family:"IBM Plex Mono";font-size:.7rem;letter-spacing:.1em;color:var(--ink-faint);display:block;margin-bottom:12px}
+.rcard h3{font-size:1.12rem;margin-bottom:11px}
+.rcard:nth-child(1) h3{color:var(--hot)}.rcard:nth-child(2) h3{color:var(--cool)}.rcard:nth-child(3) h3{color:var(--volt)}
+.rcard p{color:var(--ink-soft);font-size:.93rem}
 
-    .authors{color:var(--text);font-size:.98rem;margin-bottom:6px;line-height:1.9}
-    .authors sup{color:var(--grid);font-family:"IBM Plex Mono";font-size:.7em;font-weight:600}
-    .corr{color:var(--action)}
-    .affil{color:var(--faint);font-size:.83rem;line-height:1.85;max-width:60ch;margin-bottom:6px}
-    .affil sup{color:var(--grid);font-family:"IBM Plex Mono";font-size:.72em}
-    .corr-note{color:var(--faint);font-size:.8rem;margin-bottom:26px}
+/* ---------------- Release ---------------- */
+.relgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:8px}
+.relgrid article{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--shadow-sm);
+  display:flex;flex-direction:column;gap:10px;transition:transform .3s var(--ease),border-color .3s}
+.relgrid article:hover{transform:translateY(-4px);border-color:var(--cool)}
+.relgrid h3{font-size:1.05rem}
+.relgrid p{color:var(--ink-soft);font-size:.88rem;flex:1}
+.relgrid a{color:var(--cool);font-family:"IBM Plex Mono";font-size:.85rem;font-weight:500}
+.relgrid a[aria-disabled="true"]{color:var(--ink-faint);pointer-events:none}
 
-    .button-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px}
-    .button{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:12px;
-      border:1px solid var(--line-strong);color:var(--text);font-size:.92rem;font-weight:500;
-      background:var(--surface);transition:transform .2s var(--ease),border-color .2s,background .2s}
-    .button:hover{transform:translateY(-2px);border-color:var(--grid);background:var(--surface-2)}
-    .button.primary{border:none;color:#0a0d18;font-weight:600;
-      background:linear-gradient(115deg,var(--grid),var(--intent));box-shadow:0 12px 30px -12px var(--intent)}
-    .button.primary:hover{box-shadow:0 16px 36px -12px var(--intent)}
-    .button svg{width:15px;height:15px}
-    .release-note{color:var(--faint);font-size:.85rem;display:inline-flex;align-items:center;gap:8px}
-    .release-note::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--charge);box-shadow:0 0 8px var(--charge)}
+/* ---------------- Timeline ---------------- */
+.tl{margin-top:20px;padding-left:26px;position:relative}
+.tl::before{content:"";position:absolute;left:5px;top:6px;bottom:14px;width:2px;background:linear-gradient(var(--cool),var(--volt),transparent)}
+.tl > div{position:relative;padding:0 0 26px 8px}
+.tl > div::before{content:"";position:absolute;left:-26px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--cool)}
+.tl time{font-family:"IBM Plex Mono";font-size:.78rem;color:var(--hot);letter-spacing:.05em}
+.tl p{color:var(--ink-soft);font-size:.93rem;margin-top:3px;max-width:62ch}
 
-    /* hero figure */
-    .hero-figure{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-strong);
-      background:var(--surface);box-shadow:var(--shadow);animation:floaty 7s ease-in-out infinite}
-    .hero-figure img{width:100%}
-    .hero-figure::after{content:"";position:absolute;inset:0;pointer-events:none;
-      background:linear-gradient(160deg,transparent 55%, rgba(139,123,255,.12));mix-blend-mode:screen}
-    .hero-figure .scanline{position:absolute;left:0;right:0;height:36%;top:-40%;
-      background:linear-gradient(to bottom, transparent, rgba(52,228,234,.16), transparent);
-      animation:scan 5.5s linear infinite;pointer-events:none}
-    @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-    @keyframes scan{0%{top:-40%}100%{top:110%}}
+/* ---------------- Citation ---------------- */
+.cite pre{background:var(--ink);border-radius:16px;padding:24px;overflow-x:auto;margin-top:8px;box-shadow:var(--shadow)}
+.cite code{font-family:"IBM Plex Mono";font-size:.84rem;color:#c9d6ee;line-height:1.75;white-space:pre}
+.cite code .k{color:#7fb0ff}.cite code .s{color:#ffb3c6}
+.copy{margin-top:15px;padding:10px 18px;border-radius:11px;background:var(--white);border:1px solid var(--line);
+  font:inherit;font-size:.88rem;cursor:pointer;box-shadow:var(--shadow-sm);transition:border-color .2s,color .2s}
+.copy:hover{border-color:var(--cool)}.copy.done{border-color:var(--pos);color:var(--pos)}
 
-    /* ---------- Stats ---------- */
-    .stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
-    .stat-card{padding:26px 20px;border-radius:var(--radius-sm);border:1px solid var(--line);
-      background:linear-gradient(180deg,var(--surface),rgba(17,24,52,.4));position:relative;overflow:hidden;
-      transition:transform .3s var(--ease),border-color .3s}
-    .stat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
-      background:linear-gradient(90deg,var(--grid),var(--intent));opacity:.5;transition:opacity .3s}
-    .stat-card:hover{transform:translateY(-6px);border-color:var(--line-strong)}
-    .stat-card:hover::before{opacity:1}
-    .stat-value{font-family:"Space Grotesk";font-size:clamp(1.5rem,2.6vw,2rem);font-weight:700;display:block;
-      background:linear-gradient(120deg,var(--text),var(--grid));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .stat-label{color:var(--muted);font-size:.82rem;margin-top:6px;display:block}
+/* ---------------- Footer ---------------- */
+.foot{margin-left:var(--rail);border-top:1px solid var(--line);padding:36px 48px 60px}
+.foot p{color:var(--ink-faint);font-size:.85rem;max-width:70ch}
 
-    /* ---------- Two column ---------- */
-    .two-col{display:grid;grid-template-columns:1.1fr .9fr;gap:52px;align-items:center}
-    .two-col p{margin-bottom:16px}
-    .info-panel{border:1px solid var(--line-strong);border-radius:var(--radius);padding:30px;
-      background:linear-gradient(180deg,var(--surface-2),var(--surface));box-shadow:var(--shadow)}
-    .info-panel h3{font-size:1.15rem;margin-bottom:18px;color:var(--grid)}
-    .clean-list{list-style:none;display:flex;flex-direction:column;gap:12px}
-    .clean-list li{position:relative;padding-left:26px;color:var(--muted);font-size:.96rem}
-    .clean-list li::before{content:"";position:absolute;left:0;top:9px;width:10px;height:10px;border-radius:3px;
-      background:linear-gradient(135deg,var(--charge),var(--action));box-shadow:0 0 10px -2px var(--action)}
+/* ---------------- Reveal ---------------- */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.stg > *{opacity:0;transform:translateY(20px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.stg.in > *{opacity:1;transform:none}
+.stg.in>*:nth-child(1){transition-delay:.05s}.stg.in>*:nth-child(2){transition-delay:.12s}
+.stg.in>*:nth-child(3){transition-delay:.19s}.stg.in>*:nth-child(4){transition-delay:.26s}.stg.in>*:nth-child(5){transition-delay:.33s}
 
-    /* ---------- Figures ---------- */
-    .wide-figure{margin:14px auto 0;max-width:960px;border-radius:var(--radius);overflow:hidden;
-      border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
-    .wide-figure img{width:100%}
-    figcaption{color:var(--faint);font-size:.85rem;padding:14px 20px;border-top:1px solid var(--line);text-align:center}
-    .figure-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
-    .card-figure{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--line);background:var(--surface);
-      transition:transform .3s var(--ease),border-color .3s}
-    .card-figure:hover{transform:translateY(-5px);border-color:var(--grid)}
-    .card-figure img{width:100%}
-    .card-figure figcaption{font-size:.8rem;padding:12px 14px}
-
-    /* validation */
-    .validation-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:26px}
-    .validation-grid > div{border:1px solid var(--line);border-radius:var(--radius-sm);padding:18px 20px;
-      background:var(--surface);transition:border-color .3s}
-    .validation-grid > div:hover{border-color:var(--grid)}
-    .validation-grid strong{font-family:"Space Grotesk";font-size:1.5rem;display:block;color:var(--grid)}
-    .validation-grid span{color:var(--muted);font-size:.82rem}
-
-    /* results */
-    .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:8px 0 8px}
-    .result-card{padding:28px 24px;border-radius:var(--radius);border:1px solid var(--line);
-      background:linear-gradient(180deg,var(--surface),rgba(17,24,52,.35));position:relative;overflow:hidden;
-      transition:transform .3s var(--ease),border-color .3s}
-    .result-card::after{content:"";position:absolute;bottom:-40%;right:-20%;width:160px;height:160px;border-radius:50%;
-      background:radial-gradient(circle,var(--intent-soft),transparent 70%);transition:opacity .3s;opacity:.6}
-    .result-card:hover{transform:translateY(-6px);border-color:var(--line-strong)}
-    .result-card:hover::after{opacity:1}
-    .result-card h3{font-size:1.12rem;margin-bottom:12px}
-    .result-card:nth-child(1) h3{color:var(--charge)}
-    .result-card:nth-child(2) h3{color:var(--grid)}
-    .result-card:nth-child(3) h3{color:var(--intent)}
-    .result-card p{color:var(--muted);font-size:.94rem;position:relative;z-index:1}
-
-    /* release */
-    .release-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:14px}
-    .release-grid article{padding:26px 22px;border-radius:var(--radius);border:1px solid var(--line);
-      background:var(--surface);display:flex;flex-direction:column;gap:12px;transition:transform .3s var(--ease),border-color .3s}
-    .release-grid article:hover{transform:translateY(-6px);border-color:var(--grid)}
-    .release-grid h3{font-size:1.05rem;color:var(--text)}
-    .release-grid p{color:var(--muted);font-size:.88rem;flex:1}
-    .release-grid a{color:var(--grid);font-size:.88rem;font-family:"IBM Plex Mono";font-weight:500}
-    .release-grid a[aria-disabled="true"]{color:var(--faint);pointer-events:none}
-
-    /* timeline */
-    .timeline{display:flex;flex-direction:column;gap:0;margin-top:18px;position:relative;padding-left:26px}
-    .timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;
-      background:linear-gradient(var(--grid),var(--intent),transparent)}
-    .timeline > div{position:relative;padding:0 0 30px 6px}
-    .timeline > div::before{content:"";position:absolute;left:-26px;top:5px;width:12px;height:12px;border-radius:50%;
-      background:var(--bg);border:2px solid var(--grid);box-shadow:0 0 12px -2px var(--grid)}
-    .timeline time{font-family:"IBM Plex Mono";font-size:.78rem;color:var(--charge);letter-spacing:.06em}
-    .timeline p{color:var(--muted);font-size:.94rem;margin-top:4px;max-width:62ch}
-
-    /* citation */
-    .citation-section pre{background:var(--bg-2);border:1px solid var(--line-strong);border-radius:var(--radius);
-      padding:26px;overflow-x:auto;margin-top:8px;position:relative}
-    .citation-section code{font-family:"IBM Plex Mono";font-size:.85rem;color:var(--muted);line-height:1.75;white-space:pre}
-    .copy-button{margin-top:16px;padding:10px 18px;border-radius:10px;border:1px solid var(--line-strong);
-      background:var(--surface);color:var(--text);font:inherit;font-size:.88rem;cursor:pointer;
-      transition:background .2s,border-color .2s}
-    .copy-button:hover{border-color:var(--grid);background:var(--surface-2)}
-    .copy-button.copied{border-color:var(--grid);color:var(--grid)}
-
-    /* footer */
-    .footer{border-top:1px solid var(--line);margin-top:20px;padding:44px 24px 60px}
-    .footer p{max-width:var(--maxw);margin:0 auto;color:var(--faint);font-size:.86rem;text-align:center}
-
-    /* ---------- Reveal animation ---------- */
-    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-    .reveal.in{opacity:1;transform:none}
-    .stagger > *{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
-    .stagger.in > *{opacity:1;transform:none}
-    .stagger.in > *:nth-child(1){transition-delay:.05s}
-    .stagger.in > *:nth-child(2){transition-delay:.12s}
-    .stagger.in > *:nth-child(3){transition-delay:.19s}
-    .stagger.in > *:nth-child(4){transition-delay:.26s}
-    .stagger.in > *:nth-child(5){transition-delay:.33s}
-
-    /* ---------- Responsive ---------- */
-    @media (max-width:900px){
-      .hero{grid-template-columns:1fr;gap:36px}
-      .hero-figure{order:-1}
-      .two-col{grid-template-columns:1fr;gap:30px}
-      .stats-grid{grid-template-columns:repeat(2,1fr)}
-      .figure-grid,.result-grid,.release-grid{grid-template-columns:1fr}
-      .nav-links{display:none}
-      .nav-links.open{display:flex;position:absolute;top:62px;left:0;right:0;flex-direction:column;gap:0;
-        background:var(--bg-2);border-bottom:1px solid var(--line);padding:8px 24px}
-      .nav-links.open a{padding:12px 0;border-bottom:1px solid var(--line)}
-      .menu-button{display:block}
-      .section{padding:70px 0}
-    }
-    @media (max-width:560px){
-      .stats-grid{grid-template-columns:1fr}
-      .validation-grid{grid-template-columns:1fr}
-    }
-
-    @media (prefers-reduced-motion:reduce){
-      *{animation:none !important;transition:none !important;scroll-behavior:auto}
-      .reveal,.stagger > *{opacity:1;transform:none}
-      #field-canvas{display:none}
-    }
-  </style>
+/* ---------------- Responsive ---------------- */
+@media (max-width:1000px){
+  .rail{display:none}
+  .main,.foot{margin-left:0}
+  .topbar{display:flex;position:sticky;top:0;z-index:50;align-items:center;justify-content:space-between;
+    padding:14px 20px;background:rgba(238,243,250,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .topbar .brand{font-size:1.05rem}
+  .menu-btn{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:8px 13px;font:inherit;font-size:.85rem;cursor:pointer}
+  .drawer{display:none;flex-direction:column;position:sticky;top:57px;z-index:49;background:var(--paper-2);border-bottom:1px solid var(--line);padding:8px 20px}
+  .drawer.open{display:flex}
+  .drawer a{padding:11px 4px;border-bottom:1px solid var(--line);color:var(--ink-soft);display:flex;gap:12px}
+  .drawer a .n{font-family:"IBM Plex Mono";font-size:.72rem;color:var(--ink-faint)}
+  .main{padding:0 24px;max-width:100%}
+  .foot{padding:32px 24px 50px}
+  .two{grid-template-columns:1fr;gap:30px}
+  .fgrid,.rgrid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat{border-right:none;border-bottom:1px solid var(--line)}
+}
+@media (max-width:560px){
+  .stats{grid-template-columns:1fr}.vgrid,.relgrid{grid-template-columns:1fr}
+  .section{padding:64px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto}
+  .reveal,.stg>*{opacity:1;transform:none}
+}
+</style>
 </head>
 <body id="top">
-  <canvas id="field-canvas" aria-hidden="true"></canvas>
-  <div class="veil" aria-hidden="true"></div>
 
-  <div class="wrap">
-    <header class="site-header">
-      <nav class="nav">
-        <a class="brand" href="#top" aria-label="EVLA home"><span class="brand-mark">E</span><span>EVLA</span></a>
-        <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false">Menu</button>
-        <div class="nav-links">
-          <a href="#overview">Overview</a><a href="#dataset">Dataset</a><a href="#validation">Validation</a>
-          <a href="#results">Results</a><a href="#release">Release</a><a href="#citation">Citation</a>
-        </div>
-      </nav>
-    </header>
+<!-- Desktop rail -->
+<aside class="rail">
+  <a class="brand" href="#top"><span class="brand-mark">E</span>EVLA</a>
+  <div class="rail-tag">Energy · V · L · A</div>
+  <ul class="index">
+    <li><a href="#overview"><span class="n">01</span>Overview</a></li>
+    <li><a href="#dataset"><span class="n">02</span>Dataset</a></li>
+    <li><a href="#fields"><span class="n">03</span>Energy fields</a></li>
+    <li><a href="#validation"><span class="n">04</span>Validation</a></li>
+    <li><a href="#pipeline"><span class="n">05</span>Pipeline</a></li>
+    <li><a href="#results"><span class="n">06</span>Results</a></li>
+    <li><a href="#release"><span class="n">07</span>Release</a></li>
+    <li><a href="#citation"><span class="n">08</span>Citation</a></li>
+  </ul>
+  <div class="rail-foot">Benchmark &amp; reproducibility package for energy decision learning.<br><br><a href="https://github.com/LyesSaadSaoud/EVLA-Energy" target="_blank" rel="noopener">github →</a></div>
+</aside>
 
-    <main>
-      <!-- HERO -->
-      <section class="hero reveal">
-        <div class="hero-content">
-          <span class="eyebrow"><span class="dot"></span>Physics-grounded multimodal benchmark</span>
-          <h1>Energy <span class="grad">Vision-Language-Action</span> for Residential Energy Management</h1>
-          <p class="lead">EVLA studies how energy-field perception, explicit physical state, and natural-language objectives map to short-horizon battery-action trajectories.</p>
+<!-- Mobile top bar -->
+<div class="topbar">
+  <a class="brand" href="#top"><span class="brand-mark">E</span>EVLA</a>
+  <button class="menu-btn" aria-expanded="false">Sections</button>
+</div>
+<nav class="drawer">
+  <a href="#overview"><span class="n">01</span>Overview</a>
+  <a href="#dataset"><span class="n">02</span>Dataset</a>
+  <a href="#fields"><span class="n">03</span>Energy fields</a>
+  <a href="#validation"><span class="n">04</span>Validation</a>
+  <a href="#pipeline"><span class="n">05</span>Pipeline</a>
+  <a href="#results"><span class="n">06</span>Results</a>
+  <a href="#release"><span class="n">07</span>Release</a>
+  <a href="#citation"><span class="n">08</span>Citation</a>
+</nav>
 
-          <div class="equation" aria-label="A equals f of S, Z, L">
-            <span class="eq-A">A</span><span class="eq-op">= f (</span>
-            <span class="chip s"><span class="k"></span>S · state</span>
-            <span class="chip z"><span class="k"></span>Z · vision</span>
-            <span class="chip l"><span class="k"></span>L · language</span>
-            <span class="eq-op">)</span>
-          </div>
+<main class="main">
 
-          <p class="authors">
-            Lyes Saad Saoud<sup>a,</sup><sup class="corr">*</sup>,
-            Oualid Doukhi<sup>b</sup>,
-            Ehsan Reihani<sup>c</sup>,
-            Saeed Spaci<sup>d</sup>,
-            Reza Gorbani<sup>e</sup>, and
-            Moussa Ayyash<sup>f</sup>
-          </p>
-          <p class="affil">
-            <sup>a</sup> Mohamed bin Zayed University of Artificial Intelligence, Abu Dhabi, UAE<br>
-            <sup>b</sup> Center for Autonomous Intelligence and e-Mobility, Jeonbuk National University, Jeonju-si, Jeollabuk-do, South Korea<br>
-            <sup>c</sup> Dept. of Electrical &amp; Computer Engineering and Computer Science, California State University, Bakersfield, USA<br>
-            <sup>d</sup> Hawaii Natural Energy Institute, Honolulu, HI, USA<br>
-            <sup>e</sup> Mechanical Engineering, University of Hawai&#699;i at M&#257;noa, Honolulu, HI, USA<br>
-            <sup>f</sup> Chicago State University, Chicago, IL 60628, USA
-          </p>
-          <p class="corr-note"><span class="corr">*</span> Corresponding author.</p>
+  <!-- HERO -->
+  <section class="section hero reveal">
+    <span class="eyebrow"><span class="live"></span>Physics-grounded multimodal benchmark</span>
+    <h1>Energy <span class="g">Vision-Language-Action</span> for residential energy</h1>
+    <p class="lead">EVLA maps energy-field perception, explicit physical state, and natural-language objectives to short-horizon battery-action trajectories.</p>
 
-          <div class="button-row">
-            <a class="button primary" href="https://arxiv.org/abs/ARXIV_ID" target="_blank" rel="noopener">arXiv Paper</a>
-            <a class="button" href="https://arxiv.org/pdf/ARXIV_ID" target="_blank" rel="noopener">Paper PDF</a>
-            <a class="button" href="https://arxiv.org/src/ARXIV_ID/anc/EAAI-Supplementary-Material.pdf" target="_blank" rel="noopener">Supplementary PDF</a>
-            <a class="button" href="https://github.com/LyesSaadSaoud/EVLA-Energy" target="_blank" rel="noopener">Code</a>
-            <a class="button" href="https://huggingface.co/datasets/saadsaoudlyes/EVLA" target="_blank" rel="noopener">Dataset</a>
-          </div>
-          <p class="release-note">Dataset status: private during review; planned public release after manuscript acceptance.</p>
-        </div>
+    <!-- Signature: self-drawing battery-action trajectory -->
+    <figure class="readout" id="readout">
+      <div class="readout-head">
+        <span class="readout-title">Battery-action trajectory · horizon = 16 steps</span>
+        <span class="readout-live">step <b id="ro-step">00</b> · a = <b id="ro-val">+0.00</b></span>
+      </div>
+      <svg id="traj" viewBox="0 0 640 300" role="img" aria-label="Illustrative 16-step battery-action trajectory"></svg>
+      <div class="legend">
+        <span><i style="background:var(--hot)"></i>charge (a &gt; 0)</span>
+        <span><i style="background:var(--cool)"></i>discharge (a &lt; 0)</span>
+        <span><i style="background:var(--ink-faint)"></i>action = 0 baseline</span>
+      </div>
+      <div class="readout-note">schematic / illustrative — not measured results</div>
+    </figure>
 
-        <figure class="hero-figure">
-          <div class="scanline" aria-hidden="true"></div>
-          <img src="static/images/evla_main.png" alt="EVLA formulation diagram">
-        </figure>
-      </section>
+    <div class="eq" aria-label="A equals f of S, Z, L">
+      <span class="A">A</span><span class="op">= f (</span>
+      <span class="tok s"><i></i>S · state</span>
+      <span class="tok z"><i></i>Z · vision</span>
+      <span class="tok l"><i></i>L · language</span>
+      <span class="op">)</span>
+    </div>
 
-      <!-- STATS -->
-      <section class="section" aria-label="EVLA benchmark summary">
-        <div class="stats-grid stagger reveal">
-          <div class="stat-card"><span class="stat-value count-up" data-target="6588045">0</span><span class="stat-label">multimodal samples</span></div>
-          <div class="stat-card"><span class="stat-value count-up" data-target="439203">0</span><span class="stat-label">base operating states</span></div>
-          <div class="stat-card"><span class="stat-value">3 × 5</span><span class="stat-label">hidden regimes &amp; objectives</span></div>
-          <div class="stat-card"><span class="stat-value count-up" data-target="16">0</span><span class="stat-label">battery-action steps</span></div>
-          <div class="stat-card"><span class="stat-value count-up" data-target="108">0</span><span class="stat-label">reported ablation runs</span></div>
-        </div>
-      </section>
+    <p class="authors">
+      Lyes Saad Saoud<sup>a,</sup><sup class="corr">*</sup>,
+      Oualid Doukhi<sup>b</sup>, Ehsan Reihani<sup>c</sup>, Saeed Spaci<sup>d</sup>,
+      Reza Gorbani<sup>e</sup>, and Moussa Ayyash<sup>f</sup>
+    </p>
+    <p class="affil">
+      <sup>a</sup> Mohamed bin Zayed University of Artificial Intelligence, Abu Dhabi, UAE<br>
+      <sup>b</sup> Center for Autonomous Intelligence and e-Mobility, Jeonbuk National University, Jeonju-si, Jeollabuk-do, South Korea<br>
+      <sup>c</sup> Dept. of Electrical &amp; Computer Engineering and Computer Science, California State University, Bakersfield, USA<br>
+      <sup>d</sup> Hawaii Natural Energy Institute, Honolulu, HI, USA<br>
+      <sup>e</sup> Mechanical Engineering, University of Hawai&#699;i at M&#257;noa, Honolulu, HI, USA<br>
+      <sup>f</sup> Chicago State University, Chicago, IL 60628, USA
+    </p>
+    <p class="corr-note"><span class="corr">*</span> Corresponding author.</p>
 
-      <!-- OVERVIEW -->
-      <section class="section two-col reveal" id="overview">
-        <div>
-          <span class="kicker">Overview</span>
-          <h2>From energy context and user intent to battery-control trajectories</h2>
-          <p>EVLA adapts the Vision-Language-Action idea to a non-robotic cyber-physical energy setting. Each sample combines an RGB energy-field representation, a physical state vector, a natural-language objective, and a 16-step battery-action reference generated by a physics-consistent shooting-MPC oracle.</p>
-          <p>The benchmark is built around the controlled relation <strong>A = f(S, Z, L)</strong>, where <strong>S</strong> is the explicit physical state, <strong>Z</strong> is a hidden visual-energy regime, <strong>L</strong> is the language objective, and <strong>A</strong> is the action trajectory.</p>
-        </div>
-        <div class="info-panel">
-          <h3>Sample contents</h3>
-          <ul class="clean-list">
-            <li>RGB energy-field image</li>
-            <li>Physical state: price, SOC, indoor temperature, hour</li>
-            <li>Language objective: energy saving, comfort, balanced, grid support, eco</li>
-            <li>16-step normalized battery-action trajectory</li>
-            <li>Metadata for controlled counterfactual grouping</li>
-          </ul>
-        </div>
-      </section>
+    <div class="btns">
+      <a class="btn primary" href="https://arxiv.org/abs/ARXIV_ID" target="_blank" rel="noopener">arXiv Paper</a>
+      <a class="btn" href="https://arxiv.org/pdf/ARXIV_ID" target="_blank" rel="noopener">Paper PDF</a>
+      <a class="btn" href="https://arxiv.org/src/ARXIV_ID/anc/EAAI-Supplementary-Material.pdf" target="_blank" rel="noopener">Supplementary PDF</a>
+      <a class="btn" href="https://github.com/LyesSaadSaoud/EVLA-Energy" target="_blank" rel="noopener">Code</a>
+      <a class="btn" href="https://huggingface.co/datasets/saadsaoudlyes/EVLA" target="_blank" rel="noopener">Dataset</a>
+    </div>
+    <p class="status">Dataset status: private during review; planned public release after manuscript acceptance.</p>
+  </section>
 
-      <!-- DATASET -->
-      <section class="section reveal" id="dataset">
-        <div style="text-align:center;margin-bottom:8px">
-          <span class="kicker">Dataset construction</span>
-          <h2>Balanced counterfactual multi-world expansion</h2>
-        </div>
-        <p class="centered">Each retained operating state is expanded across three hidden visual-energy regimes and five language objectives, producing 15 counterfactual worlds per base state while preserving the same explicit state.</p>
-        <figure class="wide-figure"><img src="static/images/dataset_multiworld_flow.png" alt="EVLA multi-world dataset expansion flow"><figcaption>EVLA expands base operating states into multimodal counterfactual worlds.</figcaption></figure>
-        <figure class="wide-figure" style="margin-top:26px"><img src="static/images/z_objective_multiworld_matrix.png" alt="Balanced Z by L multi-world expansion matrix"><figcaption>Balanced hidden-regime and language-objective construction. Each cell contains 439,203 samples.</figcaption></figure>
-      </section>
+  <!-- STATS -->
+  <section class="section reveal" aria-label="Benchmark summary">
+    <div class="stats stg reveal">
+      <div class="stat"><span class="v count" data-target="6588045">0</span><span class="l">multimodal samples</span></div>
+      <div class="stat"><span class="v count" data-target="439203">0</span><span class="l">base operating states</span></div>
+      <div class="stat"><span class="v">3 × 5</span><span class="l">regimes × objectives</span></div>
+      <div class="stat"><span class="v count" data-target="16">0</span><span class="l">battery-action steps</span></div>
+      <div class="stat"><span class="v count" data-target="108">0</span><span class="l">reported ablation runs</span></div>
+    </div>
+  </section>
 
-      <!-- ENERGY FIELD -->
-      <section class="section reveal">
-        <div style="text-align:center;margin-bottom:8px">
-          <span class="kicker">Energy-field observations</span>
-          <h2>Visual modality for latent energy context</h2>
-        </div>
-        <p class="centered">EVLA does not use ordinary camera scenes. The visual input is an energy-field representation designed to encode hidden operating context through image texture while keeping the explicit state fixed.</p>
-        <figure class="wide-figure"><img src="static/images/energy_field_gallery.png" alt="Representative EVLA energy-field samples"><figcaption>Representative energy-field samples across hidden regimes and language objectives.</figcaption></figure>
-      </section>
+  <!-- OVERVIEW -->
+  <section class="section two reveal" id="overview">
+    <div>
+      <div class="kicker"><span class="idx">01</span>Overview</div>
+      <h2>Energy context and user intent to battery control</h2>
+      <p>EVLA adapts the Vision-Language-Action idea to a non-robotic cyber-physical energy setting. Each sample combines an RGB energy-field representation, a physical state vector, a natural-language objective, and a 16-step battery-action reference generated by a physics-consistent shooting-MPC oracle.</p>
+      <p>The benchmark is built around the controlled relation <strong>A = f(S, Z, L)</strong>, where <strong>S</strong> is the explicit physical state, <strong>Z</strong> is a hidden visual-energy regime, <strong>L</strong> is the language objective, and <strong>A</strong> is the action trajectory.</p>
+    </div>
+    <div class="panel">
+      <h3>Sample contents</h3>
+      <ul class="cl">
+        <li>RGB energy-field image</li>
+        <li>Physical state: price, SOC, indoor temperature, hour</li>
+        <li>Language objective: energy saving, comfort, balanced, grid support, eco</li>
+        <li>16-step normalized battery-action trajectory</li>
+        <li>Metadata for controlled counterfactual grouping</li>
+      </ul>
+    </div>
+  </section>
 
-      <!-- VALIDATION -->
-      <section class="section two-col reveal" id="validation">
-        <div>
-          <span class="kicker">Validation</span>
-          <h2>Structural checks for reproducibility</h2>
-          <p>The release report checks the integrity of the generated benchmark: malformed JSON files, missing state files, trajectory-length errors, inconsistent SOC or indoor-temperature assignments across counterfactual groups, and sampled missing images.</p>
-          <div class="validation-grid">
-            <div><strong>0</strong><span>bad JSON files</span></div>
-            <div><strong>0</strong><span>missing state files</span></div>
-            <div><strong>0</strong><span>trajectory-length errors</span></div>
-            <div><strong>0</strong><span>inconsistent SOC/Tin groups</span></div>
-            <div style="grid-column:1/-1"><strong>0 / 6,588</strong><span>missing sampled images</span></div>
-          </div>
-        </div>
-        <figure class="card-figure"><img src="static/images/state_distributions.png" alt="Physical-state distributions in EVLA"><figcaption>Physical-state distributions for SOC, indoor temperature, price, and hour.</figcaption></figure>
-      </section>
+  <!-- DATASET -->
+  <section class="section reveal" id="dataset">
+    <div class="kicker"><span class="idx">02</span>Dataset construction</div>
+    <h2>Balanced counterfactual multi-world expansion</h2>
+    <p class="centered">Each retained operating state is expanded across three hidden visual-energy regimes and five language objectives, producing 15 counterfactual worlds per base state while preserving the same explicit state.</p>
+    <figure class="plate"><img src="static/images/dataset_multiworld_flow.png" alt="EVLA multi-world dataset expansion flow"><figcaption>EVLA expands base operating states into multimodal counterfactual worlds.</figcaption></figure>
+    <figure class="plate"><img src="static/images/z_objective_multiworld_matrix.png" alt="Balanced Z by L multi-world expansion matrix"><figcaption>Balanced hidden-regime and language-objective construction. Each cell contains 439,203 samples.</figcaption></figure>
+  </section>
 
-      <!-- PIPELINE -->
-      <section class="section reveal">
-        <div style="text-align:center;margin-bottom:8px">
-          <span class="kicker">Dataset generation</span>
-          <h2>Physics-grounded EVLA data construction pipeline</h2>
-        </div>
-        <p class="centered">EVLA is built from processed residential CSV files collected from 19 houses. Each valid 300-sample sliding window is converted into an RGB energy-field representation, paired with an explicit physical state vector, expanded across hidden visual-energy regimes and language objectives, and labeled using a sampling-based shooting-MPC oracle to produce a 16-step battery-action trajectory.</p>
-        <figure class="wide-figure"><img src="static/images/EVLA_data.png" alt="EVLA dataset generation pipeline"><figcaption>EVLA dataset generation pipeline. Processed residential time-series windows are transformed into multimodal tuples containing the energy-field image V, physical state S, language objective L, hidden visual-energy regime Z, and oracle battery-action trajectory A.</figcaption></figure>
-      </section>
+  <!-- ENERGY FIELDS -->
+  <section class="section reveal" id="fields">
+    <div class="kicker"><span class="idx">03</span>Energy-field observations</div>
+    <h2>A visual modality for latent energy context</h2>
+    <p class="centered">EVLA does not use ordinary camera scenes. The visual input is an energy-field representation designed to encode hidden operating context through image texture while keeping the explicit state fixed.</p>
+    <figure class="plate"><img src="static/images/energy_field_gallery.png" alt="Representative EVLA energy-field samples"><figcaption>Representative energy-field samples across hidden regimes and language objectives.</figcaption></figure>
+  </section>
 
-      <!-- RESULTS -->
-      <section class="section reveal" id="results">
-        <span class="kicker">Results</span>
-        <h2>Main empirical findings</h2>
-        <div class="result-grid stagger reveal" style="margin-top:26px">
-          <article class="result-card"><h3>Language is essential</h3><p>Removing language or using state-only input increases error substantially, showing that user intent is not a decorative label. It changes the target battery-action trajectory.</p></article>
-          <article class="result-card"><h3>Compact vision backbones are competitive</h3><p>MobileNet provides a strong accuracy-efficiency tradeoff in the current evaluation, while larger visual backbones do not clearly improve aggregate MSE.</p></article>
-          <article class="result-card"><h3>Vision encodes hidden context</h3><p>Hidden regimes shift oracle action statistics, but the aggregate learned-model MSE gain from vision is modest in the present release. This is stated directly to avoid overclaiming.</p></article>
-        </div>
-        <div class="figure-grid">
-          <figure class="card-figure"><img src="static/images/trajectory_by_objective.png" alt="Mean oracle trajectories by objective"><figcaption>Language-conditioned oracle action profiles.</figcaption></figure>
-          <figure class="card-figure"><img src="static/images/backbone_mse.png" alt="Backbone-selection MSE"><figcaption>Backbone-selection MSE over three random seeds.</figcaption></figure>
-          <figure class="card-figure"><img src="static/images/modality_ablation.png" alt="MobileNet modality ablation"><figcaption>MobileNet modality ablation.</figcaption></figure>
-        </div>
-      </section>
+  <!-- VALIDATION -->
+  <section class="section two reveal" id="validation">
+    <div>
+      <div class="kicker"><span class="idx">04</span>Validation</div>
+      <h2>Structural checks for reproducibility</h2>
+      <p>The release report checks the integrity of the generated benchmark: malformed JSON files, missing state files, trajectory-length errors, inconsistent SOC or indoor-temperature assignments across counterfactual groups, and sampled missing images.</p>
+      <div class="vgrid">
+        <div><span class="check">✓</span><span><strong>0</strong><br>bad JSON files</span></div>
+        <div><span class="check">✓</span><span><strong>0</strong><br>missing state files</span></div>
+        <div><span class="check">✓</span><span><strong>0</strong><br>trajectory-length errors</span></div>
+        <div><span class="check">✓</span><span><strong>0</strong><br>inconsistent SOC/Tin groups</span></div>
+        <div style="grid-column:1/-1"><span class="check">✓</span><span><strong>0 / 6,588</strong><br>missing sampled images</span></div>
+      </div>
+    </div>
+    <figure class="plate" style="margin-top:0"><img src="static/images/state_distributions.png" alt="Physical-state distributions in EVLA"><figcaption>Physical-state distributions for SOC, indoor temperature, price, and hour.</figcaption></figure>
+  </section>
 
-      <!-- RELEASE -->
-      <section class="section reveal" id="release">
-        <span class="kicker">Release plan</span>
-        <h2>Where each EVLA artifact lives</h2>
-        <div class="release-grid stagger reveal">
-          <article><h3>arXiv</h3><p>Paper preprint and supplementary material as an ancillary file.</p><a href="https://arxiv.org/abs/ARXIV_ID" target="_blank" rel="noopener">Paper placeholder →</a></article>
-          <article><h3>GitHub</h3><p>Code, scripts, website, small sample data, reproducibility instructions, issues, releases, and changelog.</p><a href="https://github.com/LyesSaadSaoud/EVLA-Energy" target="_blank" rel="noopener">EVLA-Energy repo →</a></article>
-          <article><h3>Hugging Face</h3><p>Full benchmark dataset, dataset card, loading examples, and optional model checkpoints.</p><a href="https://huggingface.co/datasets/saadsaoudlyes/EVLA" target="_blank" rel="noopener">EVLA dataset →</a></article>
-          <article><h3>Zenodo</h3><p>Versioned archival DOI for paper artifacts, dataset metadata, validation logs, and frozen release snapshots.</p><a href="#" aria-disabled="true">Coming soon</a></article>
-        </div>
-      </section>
+  <!-- PIPELINE -->
+  <section class="section reveal" id="pipeline">
+    <div class="kicker"><span class="idx">05</span>Dataset generation</div>
+    <h2>Physics-grounded EVLA construction pipeline</h2>
+    <p class="centered">EVLA is built from processed residential CSV files collected from 19 houses. Each valid 300-sample sliding window is converted into an RGB energy-field representation, paired with an explicit physical state vector, expanded across hidden visual-energy regimes and language objectives, and labeled using a sampling-based shooting-MPC oracle to produce a 16-step battery-action trajectory.</p>
+    <figure class="plate"><img src="static/images/EVLA_data.png" alt="EVLA dataset generation pipeline"><figcaption>EVLA dataset generation pipeline. Processed residential time-series windows are transformed into multimodal tuples containing the energy-field image V, physical state S, language objective L, hidden visual-energy regime Z, and oracle battery-action trajectory A.</figcaption></figure>
+  </section>
 
-      <!-- NEWS -->
-      <section class="section reveal">
-        <span class="kicker">News</span>
-        <h2>Updates</h2>
-        <div class="timeline">
-          <div><time>2026-07</time><p>Initial EVLA paper and supplementary package prepared for submission with validated dataset summary, active figures, tables, and ablation bundle.</p></div>
-          <div><time>During review</time><p>Hugging Face dataset remains private or restricted; public release is planned after acceptance.</p></div>
-          <div><time>Coming soon</time><p>arXiv paper link, supplementary ancillary link, Zenodo DOI, and final public dataset release.</p></div>
-        </div>
-      </section>
+  <!-- RESULTS -->
+  <section class="section reveal" id="results">
+    <div class="kicker"><span class="idx">06</span>Results</div>
+    <h2>Main empirical findings</h2>
+    <div class="rgrid stg reveal" style="margin-top:26px">
+      <article class="rcard"><span class="tag">FINDING / 01</span><h3>Language is essential</h3><p>Removing language or using state-only input increases error substantially, showing that user intent is not a decorative label. It changes the target battery-action trajectory.</p></article>
+      <article class="rcard"><span class="tag">FINDING / 02</span><h3>Compact backbones compete</h3><p>MobileNet provides a strong accuracy-efficiency tradeoff in the current evaluation, while larger visual backbones do not clearly improve aggregate MSE.</p></article>
+      <article class="rcard"><span class="tag">FINDING / 03</span><h3>Vision encodes hidden context</h3><p>Hidden regimes shift oracle action statistics, but the aggregate learned-model MSE gain from vision is modest in the present release. This is stated directly to avoid overclaiming.</p></article>
+    </div>
+    <div class="fgrid">
+      <figure class="plate"><img src="static/images/trajectory_by_objective.png" alt="Mean oracle trajectories by objective"><figcaption>Language-conditioned oracle action profiles.</figcaption></figure>
+      <figure class="plate"><img src="static/images/backbone_mse.png" alt="Backbone-selection MSE"><figcaption>Backbone-selection MSE over three random seeds.</figcaption></figure>
+      <figure class="plate"><img src="static/images/modality_ablation.png" alt="MobileNet modality ablation"><figcaption>MobileNet modality ablation.</figcaption></figure>
+    </div>
+  </section>
 
-      <!-- CITATION -->
-      <section class="section citation-section reveal" id="citation">
-        <span class="kicker">Citation</span>
-        <h2>BibTeX</h2>
-        <pre><code id="bibtex">@article{saoud2026evla,
+  <!-- RELEASE -->
+  <section class="section reveal" id="release">
+    <div class="kicker"><span class="idx">07</span>Release plan</div>
+    <h2>Where each EVLA artifact lives</h2>
+    <div class="relgrid stg reveal">
+      <article><h3>arXiv</h3><p>Paper preprint and supplementary material as an ancillary file.</p><a href="https://arxiv.org/abs/ARXIV_ID" target="_blank" rel="noopener">Paper placeholder →</a></article>
+      <article><h3>GitHub</h3><p>Code, scripts, website, small sample data, reproducibility instructions, issues, releases, and changelog.</p><a href="https://github.com/LyesSaadSaoud/EVLA-Energy" target="_blank" rel="noopener">EVLA-Energy repo →</a></article>
+      <article><h3>Hugging Face</h3><p>Full benchmark dataset, dataset card, loading examples, and optional model checkpoints.</p><a href="https://huggingface.co/datasets/saadsaoudlyes/EVLA" target="_blank" rel="noopener">EVLA dataset →</a></article>
+      <article><h3>Zenodo</h3><p>Versioned archival DOI for paper artifacts, dataset metadata, validation logs, and frozen release snapshots.</p><a href="#" aria-disabled="true">Coming soon</a></article>
+    </div>
+    <div class="kicker" style="margin-top:52px"><span class="idx">—</span>News</div>
+    <div class="tl">
+      <div><time>2026-07</time><p>Initial EVLA paper and supplementary package prepared for submission with validated dataset summary, active figures, tables, and ablation bundle.</p></div>
+      <div><time>During review</time><p>Hugging Face dataset remains private or restricted; public release is planned after acceptance.</p></div>
+      <div><time>Coming soon</time><p>arXiv paper link, supplementary ancillary link, Zenodo DOI, and final public dataset release.</p></div>
+    </div>
+  </section>
+
+  <!-- CITATION -->
+  <section class="section cite reveal" id="citation">
+    <div class="kicker"><span class="idx">08</span>Citation</div>
+    <h2>BibTeX</h2>
+    <pre><code id="bibtex">@article{saoud2026evla,
   title   = {Energy Vision-Language-Action: A Physics-Grounded Multimodal
              Benchmark for Intent-Conditioned Residential Energy Management},
   author  = {Saad Saoud, Lyes and Doukhi, Oualid and Reihani, Ehsan and
@@ -491,136 +456,171 @@
   year    = {2026},
   note    = {Initial EVLA dataset release}
 }</code></pre>
-        <button class="copy-button" data-copy-target="bibtex">Copy BibTeX</button>
-      </section>
-    </main>
+    <button class="copy" data-copy="bibtex">Copy BibTeX</button>
+  </section>
 
-    <footer class="footer">
-      <p>EVLA is a benchmark and reproducibility package for energy decision learning. It is not a certified deployment-ready residential controller.</p>
-    </footer>
-  </div>
+</main>
 
-  <script>
-  (function(){
-    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+<footer class="foot">
+  <p>EVLA is a benchmark and reproducibility package for energy decision learning. It is not a certified deployment-ready residential controller.</p>
+</footer>
 
-    /* ---- Mobile menu ---- */
-    var mb = document.querySelector('.menu-button');
-    var links = document.querySelector('.nav-links');
-    if(mb){
-      mb.addEventListener('click', function(){
-        var open = links.classList.toggle('open');
-        mb.setAttribute('aria-expanded', open);
-      });
-      links.addEventListener('click', function(e){
-        if(e.target.tagName === 'A'){ links.classList.remove('open'); mb.setAttribute('aria-expanded', false); }
-      });
-    }
+<script>
+(function(){
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* ---- Reveal on scroll + count-up trigger ---- */
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(en){
-        if(en.isIntersecting){
-          en.target.classList.add('in');
-          en.target.querySelectorAll('.count-up').forEach(runCount);
-          io.unobserve(en.target);
-        }
-      });
-    }, {threshold:0.15});
-    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  /* ---- Mobile drawer ---- */
+  var mb=document.querySelector('.menu-btn'), dr=document.querySelector('.drawer');
+  if(mb){
+    mb.addEventListener('click',function(){var o=dr.classList.toggle('open');mb.setAttribute('aria-expanded',o);});
+    dr.addEventListener('click',function(e){if(e.target.closest('a')){dr.classList.remove('open');mb.setAttribute('aria-expanded',false);}});
+  }
 
-    /* ---- Count up ---- */
-    function runCount(el){
-      if(el.dataset.done) return;
-      el.dataset.done = "1";
-      var target = parseInt(el.dataset.target, 10) || 0;
-      if(reduced){ el.textContent = target.toLocaleString(); return; }
-      var dur = 1400, start = performance.now();
-      function tick(now){
-        var p = Math.min((now - start)/dur, 1);
-        var eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = Math.round(target * eased).toLocaleString();
-        if(p < 1) requestAnimationFrame(tick);
+  /* ---- Reveal + count trigger ---- */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if(en.isIntersecting){en.target.classList.add('in');
+        en.target.querySelectorAll('.count').forEach(count);io.unobserve(en.target);}
+    });
+  },{threshold:.14});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+
+  function count(el){
+    if(el.dataset.done)return;el.dataset.done=1;
+    var t=parseInt(el.dataset.target,10)||0;
+    if(reduced){el.textContent=t.toLocaleString();return;}
+    var d=1400,s=performance.now();
+    (function tick(now){var p=Math.min((now-s)/d,1),e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(t*e).toLocaleString();if(p<1)requestAnimationFrame(tick);})(s);
+  }
+
+  /* ---- Scrollspy on rail + drawer ---- */
+  var secs=[].slice.call(document.querySelectorAll('main section[id]'));
+  var railLinks={};
+  document.querySelectorAll('.index a, .drawer a').forEach(function(a){
+    var id=a.getAttribute('href').slice(1);(railLinks[id]=railLinks[id]||[]).push(a);
+  });
+  var spy=new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if(en.isIntersecting){
+        document.querySelectorAll('.index a.active').forEach(function(a){a.classList.remove('active');});
+        (railLinks[en.target.id]||[]).forEach(function(a){if(a.closest('.index'))a.classList.add('active');});
       }
-      requestAnimationFrame(tick);
-    }
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  secs.forEach(function(s){spy.observe(s);});
 
-    /* ---- Copy BibTeX ---- */
-    document.querySelectorAll('.copy-button').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        var code = document.getElementById(btn.dataset.copyTarget);
-        if(!code) return;
-        navigator.clipboard.writeText(code.textContent).then(function(){
-          var t = btn.textContent;
-          btn.textContent = 'Copied ✓';
-          btn.classList.add('copied');
-          setTimeout(function(){ btn.textContent = t; btn.classList.remove('copied'); }, 1800);
-        });
+  /* ---- Copy BibTeX ---- */
+  document.querySelectorAll('.copy').forEach(function(b){
+    b.addEventListener('click',function(){
+      var c=document.getElementById(b.dataset.copy);if(!c)return;
+      navigator.clipboard.writeText(c.textContent).then(function(){
+        var t=b.textContent;b.textContent='Copied ✓';b.classList.add('done');
+        setTimeout(function(){b.textContent=t;b.classList.remove('done');},1700);
       });
     });
+  });
 
-    /* ---- Ambient energy field (flowing charged particles) ---- */
-    if(reduced) return;
-    var canvas = document.getElementById('field-canvas');
-    var ctx = canvas.getContext('2d');
-    var w, h, dpr, particles = [];
-    var colors = ['#34e4ea', '#8b7bff', '#ffb020', '#ff6b9d'];
+  /* ---- Signature: battery-action trajectory ---- */
+  var SVG='http://www.w3.org/2000/svg';
+  var svg=document.getElementById('traj');
+  var data=[.15,.35,.60,.72,.55,.30,.08,-.08,-.24,-.48,-.72,-.86,-.62,-.34,-.12,.06];
+  var W=640,H=300,padL=46,padR=20,padT=22,padB=40;
+  var pw=W-padL-padR, ph=H-padT-padB, base=padT+ph/2, amp=ph/2-10;
+  var X=function(i){return padL+i*(pw/(data.length-1));};
+  var Y=function(v){return base-v*amp;};
 
-    function resize(){
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = canvas.width = innerWidth * dpr;
-      h = canvas.height = innerHeight * dpr;
-      canvas.style.width = innerWidth + 'px';
-      canvas.style.height = innerHeight + 'px';
-      var count = Math.min(70, Math.floor(innerWidth / 22));
-      particles = [];
-      for(var i=0;i<count;i++){
-        particles.push({
-          x: Math.random()*w, y: Math.random()*h,
-          vx: (Math.random()-.5)*0.25*dpr, vy: (Math.random()-.5)*0.25*dpr,
-          r: (Math.random()*1.6 + 0.7)*dpr,
-          c: colors[Math.floor(Math.random()*colors.length)]
-        });
-      }
+  function el(n,a){var e=document.createElementNS(SVG,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
+
+  // gradient defs
+  var defs=el('defs',{});
+  var g=el('linearGradient',{id:'areaG',x1:0,y1:padT,x2:0,y2:padT+ph,gradientUnits:'userSpaceOnUse'});
+  g.appendChild(el('stop',{offset:'0%','stop-color':'#ff3d68','stop-opacity':'.28'}));
+  g.appendChild(el('stop',{offset:'50%','stop-color':'#ff3d68','stop-opacity':'.02'}));
+  g.appendChild(el('stop',{offset:'50%','stop-color':'#0a84ff','stop-opacity':'.02'}));
+  g.appendChild(el('stop',{offset:'100%','stop-color':'#0a84ff','stop-opacity':'.26'}));
+  defs.appendChild(g);
+  var gl=el('linearGradient',{id:'lineG',x1:0,y1:padT,x2:0,y2:padT+ph,gradientUnits:'userSpaceOnUse'});
+  gl.appendChild(el('stop',{offset:'0%','stop-color':'#ff3d68'}));
+  gl.appendChild(el('stop',{offset:'50%','stop-color':'#6b47ff'}));
+  gl.appendChild(el('stop',{offset:'100%','stop-color':'#0a84ff'}));
+  defs.appendChild(gl);
+  svg.appendChild(defs);
+
+  // horizontal grid + labels
+  [1,.5,0,-.5,-1].forEach(function(v){
+    svg.appendChild(el('line',{x1:padL,y1:Y(v),x2:W-padR,y2:Y(v),stroke:'rgba(24,58,110,.10)','stroke-width':v===0?1.4:1,'stroke-dasharray':v===0?'':'3 4'}));
+    var tx=el('text',{x:padL-8,y:Y(v)+3.5,'text-anchor':'end','font-family':'IBM Plex Mono','font-size':10,fill:'#7a8aa3'});
+    tx.textContent=(v>0?'+':'')+v.toFixed(1);svg.appendChild(tx);
+  });
+  // x ticks (every 3)
+  for(var i=0;i<data.length;i+=3){
+    var xt=el('text',{x:X(i),y:H-14,'text-anchor':'middle','font-family':'IBM Plex Mono','font-size':10,fill:'#7a8aa3'});
+    xt.textContent='t'+i;svg.appendChild(xt);
+  }
+  var xl=el('text',{x:(padL+W-padR)/2,y:H-1,'text-anchor':'middle','font-family':'IBM Plex Mono','font-size':10,fill:'#7a8aa3'});
+  xl.textContent='control step →';svg.appendChild(xl);
+
+  // area
+  var ad='M'+X(0)+','+Y(data[0]);
+  data.forEach(function(v,i){if(i)ad+=' L'+X(i)+','+Y(v);});
+  ad+=' L'+X(data.length-1)+','+base+' L'+X(0)+','+base+' Z';
+  svg.appendChild(el('path',{d:ad,fill:'url(#areaG)'}));
+
+  // line
+  var ld='M'+X(0)+','+Y(data[0]);
+  data.forEach(function(v,i){if(i)ld+=' L'+X(i)+','+Y(v);});
+  var line=el('path',{d:ld,fill:'none',stroke:'url(#lineG)','stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round'});
+  svg.appendChild(line);
+
+  // dots
+  var dots=[];
+  data.forEach(function(v,i){
+    var c=el('circle',{cx:X(i),cy:Y(v),r:3,fill:'#fff',stroke:v>=0?'#ff3d68':'#0a84ff','stroke-width':2,opacity:0});
+    svg.appendChild(c);dots.push(c);
+  });
+
+  // cursor
+  var curLine=el('line',{x1:X(0),y1:padT,x2:X(0),y2:padT+ph,stroke:'rgba(24,58,110,.28)','stroke-width':1,opacity:0});
+  var curDot=el('circle',{cx:X(0),cy:Y(data[0]),r:6,fill:'#0c1a2e',opacity:0});
+  svg.appendChild(curLine);svg.appendChild(curDot);
+
+  var stepEl=document.getElementById('ro-step'), valEl=document.getElementById('ro-val');
+  function setReadout(i){
+    stepEl.textContent=('0'+i).slice(-2);
+    var v=data[i];valEl.textContent=(v>=0?'+':'')+v.toFixed(2);
+    valEl.style.color=v>=0?'#ff3d68':'#0a84ff';
+  }
+  function place(i){
+    curLine.setAttribute('x1',X(i));curLine.setAttribute('x2',X(i));
+    curDot.setAttribute('cx',X(i));curDot.setAttribute('cy',Y(data[i]));
+    setReadout(i);
+  }
+
+  function draw(){
+    if(reduced){
+      line.style.strokeDasharray='none';dots.forEach(function(d){d.setAttribute('opacity',1);});
+      curLine.setAttribute('opacity',1);curDot.setAttribute('opacity',1);place(data.length-1);return;
     }
-
-    var linkDist = 140;
-    function frame(){
-      ctx.clearRect(0,0,w,h);
-      var ld = linkDist * dpr;
-      for(var i=0;i<particles.length;i++){
-        var p = particles[i];
-        p.x += p.vx; p.y += p.vy;
-        if(p.x < 0 || p.x > w) p.vx *= -1;
-        if(p.y < 0 || p.y > h) p.vy *= -1;
-        // node
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = p.c;
-        ctx.globalAlpha = .7;
-        ctx.fill();
-        // links — "field lines" between nearby charges
-        for(var j=i+1;j<particles.length;j++){
-          var q = particles[j];
-          var dx = p.x-q.x, dy = p.y-q.y;
-          var d = Math.sqrt(dx*dx+dy*dy);
-          if(d < ld){
-            ctx.beginPath();
-            ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
-            ctx.strokeStyle = p.c;
-            ctx.globalAlpha = (1 - d/ld) * 0.14;
-            ctx.lineWidth = 0.8*dpr;
-            ctx.stroke();
-          }
-        }
-      }
-      ctx.globalAlpha = 1;
-      requestAnimationFrame(frame);
-    }
-    resize();
-    addEventListener('resize', resize);
-    frame();
-  })();
-  </script>
+    var len=line.getTotalLength();
+    line.style.strokeDasharray=len;line.style.strokeDashoffset=len;
+    line.style.transition='stroke-dashoffset 1.6s cubic-bezier(.22,.61,.36,1)';
+    requestAnimationFrame(function(){line.style.strokeDashoffset=0;});
+    dots.forEach(function(d,i){setTimeout(function(){d.style.transition='opacity .3s';d.setAttribute('opacity',1);},900+i*55);});
+    setTimeout(function(){
+      curLine.setAttribute('opacity',1);curDot.setAttribute('opacity',1);loop();
+    },1700);
+  }
+  var pos=0;
+  function loop(){
+    var i=Math.round(pos)%data.length;place(i);pos+=0.035;requestAnimationFrame(loop);
+  }
+  // draw once readout enters view
+  var ro=new IntersectionObserver(function(es){
+    es.forEach(function(en){if(en.isIntersecting){draw();ro.disconnect();}});
+  },{threshold:.3});
+  ro.observe(document.getElementById('readout'));
+})();
+</script>
 </body>
 </html>
